@@ -18,6 +18,7 @@ logs
 .fleet
 .idea
 .serena/
+.yarn/install-state.gz
 
 # Local env files
 .env
