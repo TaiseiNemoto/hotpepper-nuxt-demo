@@ -3,6 +3,15 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
 
+  runtimeConfig: {
+    hotpepperApiKey: '',
+    logLevel: 'info',
+    logEnableAccess: 'true',
+    public: {
+      googleMapsApiKey: '',
+    },
+  },
+
   typescript: {
     tsConfig: {
       compilerOptions: {
