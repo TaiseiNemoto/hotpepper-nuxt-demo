@@ -1,0 +1,41 @@
+## メタ情報設定方針
+| ページ      | title                              | description                                           | 設定方法                           |
+| -------- | ---------------------------------- | ----------------------------------------------------- | ------------------------------ |
+| **TOP**  | 飲食店検索サイト｜HotPepper連携デモ             | ジャンル・エリアから飲食店を検索できるWebサイトです。HotPepperグルメAPIを利用しています。  | 固定値（SSR）                       |
+| **検索結果** | 「{{検索キーワード}}」の検索結果一覧｜HotPepper連携デモ | {{ジャンル}}や{{エリア}}の飲食店を一覧表示します。HotPepperグルメAPIを利用しています。 | 動的生成（SSR時）CSR再検索時は`useHead`で更新 |
+| **詳細**   | {{店舗名}}｜{{ジャンル}}｜HotPepper連携デモ     | {{店舗名}}の店舗情報（住所・営業時間・予算など）を掲載しています。                   | 動的生成（SSR）                      |
+※テンプレート部分（`{{ }}`）はAPIレスポンスから動的に埋め込む。
+
+---
+## OGP設定方針
+
+| 項目               | 値                            | 備考                           |
+| ---------------- | ---------------------------- | ---------------------------- |
+| `og:title`       | 各ページの `title` と同一            |                              |
+| `og:description` | 各ページの `description` と同一      |                              |
+| `og:type`        | TOP：`website`検索・詳細：`article` |                              |
+| `og:url`         | 各ページのURL（SSRで生成）             | `useRequestURL()` などで取得      |
+| `og:image`       | TOP・検索：固定画像詳細：`shop.photo.l` | `/public/ogp/default.png` など |
+| `og:site_name`   | HotPepper連携デモサイト             | 固定                           |
+| `twitter:card`   | `summary_large_image`        |                              |
+
+---
+## 実装方針
+|項目|方針|
+|---|---|
+|**設定方法**|`definePageMeta` を基本とし、動的ページでは `useHead` で更新|
+|**SSR時**|ページごとにmeta情報をサーバーレンダリングで出力|
+|**CSR時**|検索結果ページの再検索時に、クエリをもとに再生成|
+|**共通設定**|`_app.config.ts` または `meta.config.ts` に共通OGP設定を定義|
+|**画像**|`/public/ogp/` 配下に固定ファイルを配置（例：`default.png`）|
+|**検証環境**|`meta name="robots" content="noindex,nofollow"` を付与|
+|**本番環境**|`index,follow` に切り替え|
+
+---
+## canonical/robots方針
+
+| 項目              | 方針                                       |
+| --------------- | ---------------------------------------- |
+| **canonical**   | SSR時に現在のURLを動的生成して出力。重複URL対策。            |
+| **robots.txt**  | 全ページ公開（検証環境を除く）                          |
+| **meta robots** | 検証環境：`noindex,nofollow`本番：`index,follow` |
