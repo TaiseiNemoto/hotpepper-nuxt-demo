@@ -1,41 +1,34 @@
-# Nuxt Minimal Starter
-
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
-
 ## Setup
 
-Make sure to install dependencies:
+Install dependencies with Yarn (the project uses Yarn 4):
 
 ```bash
-# npm
-npm install
-
-# pnpm
-pnpm install
-
-# yarn
 yarn install
-
-# bun
-bun install
 ```
+
+### Environment variables
+
+Copy `.env.example` to `.env` and set the secrets before starting the app.
+
+```bash
+cp .env.example .env
+```
+
+| Key                               | Required | Description                                   |
+| --------------------------------- | -------- | --------------------------------------------- |
+| `NUXT_HOTPEPPER_API_KEY`          | Yes      | HotPepper Gourmet API key (server only)       |
+| `NUXT_PUBLIC_GOOGLE_MAPS_API_KEY` | Yes      | Google Maps JavaScript API key (client usage) |
+| `NUXT_LOG_LEVEL`                  | No       | Minimum server log level (`info` by default)  |
+| `NUXT_LOG_ENABLE_ACCESS`          | No       | `true/false` toggle for access logging        |
+
+Refer to the Nuxt documentation for any additional setup guidance.
 
 ## Development Server
 
 Start the development server on `http://localhost:3000`:
 
 ```bash
-# npm
-npm run dev
-
-# pnpm
-pnpm dev
-
-# yarn
 yarn dev
-
-# bun
-bun run dev
 ```
 
 ## Production
@@ -43,33 +36,13 @@ bun run dev
 Build the application for production:
 
 ```bash
-# npm
-npm run build
-
-# pnpm
-pnpm build
-
-# yarn
 yarn build
-
-# bun
-bun run build
 ```
 
 Locally preview production build:
 
 ```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm preview
-
-# yarn
 yarn preview
-
-# bun
-bun run preview
 ```
 
 Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
