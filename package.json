@@ -11,13 +11,17 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare",
+    "postinstall": "nuxt prepare && husky",
     "type-check": "nuxt typecheck",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "lint:css": "stylelint \"src/**/*.{vue,scss,css}\" --allow-empty-input",
     "lint:css:fix": "stylelint \"src/**/*.{vue,scss,css}\" --fix --allow-empty-input",
     "format": "prettier --write ."
+  },
+  "lint-staged": {
+    "*.{js,ts,vue}": "eslint --fix",
+    "*": "prettier --write --ignore-unknown"
   },
   "dependencies": {
     "@nuxt/eslint": "1.10.0",
