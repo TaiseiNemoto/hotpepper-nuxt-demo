@@ -31,6 +31,26 @@ Start the development server on `http://localhost:3000`:
 yarn dev
 ```
 
+## Testing
+
+Run tests with Vitest:
+
+```bash
+# Run tests once
+yarn test --run
+
+# Run tests in watch mode
+yarn test
+
+# Run tests with UI
+yarn test:ui
+
+# Generate coverage report
+yarn test:coverage
+```
+
+The project uses [@nuxt/test-utils](https://nuxt.com/docs/getting-started/testing) for Nuxt-specific testing utilities. Tests are located in the `tests/` directory.
+
 ## Production
 
 Build the application for production:

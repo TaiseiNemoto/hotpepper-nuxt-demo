@@ -17,7 +17,10 @@
     "lint:fix": "eslint . --fix",
     "lint:css": "stylelint \"src/**/*.{vue,scss,css}\" --allow-empty-input",
     "lint:css:fix": "stylelint \"src/**/*.{vue,scss,css}\" --fix --allow-empty-input",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage"
   },
   "lint-staged": {
     "*.{js,ts,vue}": "eslint --fix",
@@ -32,8 +35,12 @@
   },
   "packageManager": "yarn@4.10.3",
   "devDependencies": {
+    "@nuxt/test-utils": "^3.20.1",
+    "@vue/test-utils": "^2.4.6",
+    "happy-dom": "^20.0.10",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.6",
+    "msw": "^2.11.6",
     "postcss": "^8.5.6",
     "postcss-html": "^1.8.0",
     "postcss-scss": "^4.0.9",
@@ -43,6 +50,7 @@
     "stylelint-prettier": "^5.0.3",
     "stylelint-scss": "^6.12.1",
     "typescript": "^5.9.3",
+    "vitest": "^3.2.0",
     "vue-tsc": "^3.1.2"
   }
 }

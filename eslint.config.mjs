@@ -11,6 +11,7 @@ export default withNuxt(
       '**/.output/**',
       'eslint.config.mjs',
       'stylelint.config.js',
+      'vitest.config.ts',
     ],
   },
 
