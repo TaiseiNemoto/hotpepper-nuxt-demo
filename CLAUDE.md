@@ -125,6 +125,30 @@ Copy `.env.example` to `.env` and set required API keys:
 - Keep messages concise and in Japanese when appropriate
 - Examples: `chore: prepare environment config`, `feat: 検索機能を追加`
 
+## Claude Code Guidelines
+
+### Quality Assurance Workflow
+
+**IMPORTANT**: Before completing any task, always run the following checks:
+
+1. **Type Check**: `yarn type-check`
+2. **Linter**: `yarn lint`
+3. **Formatter**: Verify Prettier formatting
+
+If errors are found:
+
+- Fix them with permanent solutions (not temporary workarounds)
+- Apply recommended fixes from TypeScript and ESLint
+- Ensure all changes follow project conventions
+
+### Git Workflow
+
+**IMPORTANT**: Do NOT create git commits unless explicitly instructed by the user.
+
+- Wait for user instruction before running `git commit`
+- Never commit automatically after completing tasks
+- Ask the user if they want to commit the changes
+
 ## Target Environment
 
 - Modern browsers (Chrome/Edge/Firefox/Safari latest versions)
