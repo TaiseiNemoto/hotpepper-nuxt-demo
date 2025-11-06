@@ -1,133 +1,25 @@
-# CLAUDE.md
+# Repository Guidelines
 
-This file provides guidance to AI agent when working with code in this repository.
+## プロジェクト構成とモジュール配置
 
-## Project Overview
+メインの Nuxt アプリケーションは `app/` に置かれ、ページ、レイアウト、コンポーネントが目的別に整理されています。UI 用の共通スタイルや Tailwind 設定は `app/assets/` と `app/styles/` にまとめ、フォームや地図部品は `app/components/` 配下で再利用可能に保っています。HotPepper Gourmet API に接続する Nitro エンドポイントは `server/api/`、ロジック切り出しは `server/utils/` を利用してください。環境設定や企画資料は `docs/`、静的アセットは `public/`、エンドツーエンドを除くテスト一式は `tests/` に配置します。
 
-HotPepper Gourmet API検索サイト: Nuxt 4によるSSR/CSR検証プロジェクト。飲食店の検索・閲覧機能を提供する3画面構成（TOP/検索結果/詳細）。
+## ビルド・テスト・開発コマンド
 
-## Development Commands
+ローカル開発は `yarn dev` で開始し、http://localhost:3000 で SSR/CSR を確認します。CI 相当のビルド検証には `yarn build` と `yarn preview` を連続実行してください。静的サイト検証が必要な場合のみ `yarn generate` を使います。型検証は `yarn type-check`、ESLint と Stylelint はそれぞれ `yarn lint` と `yarn lint:css`（修正時は `:fix` 系）を使います。整形は `yarn format`、ユニットテストとコンポーネントテストは `yarn test`、UI 実行は `yarn test:ui`、カバレッジは `yarn test:coverage` が基準です。
 
-### Package Management
+## コーディングスタイルと命名規約
 
-```bash
-# Install dependencies (uses Yarn 4)
-yarn install
+TypeScript は strict 設定で未使用変数を禁止します。Prettier 設定に従いセミコロンなし・シングルクオート・100 文字幅を維持してください。Vue コンポーネントは PascalCase で命名し、ファイル名と一致させます。import は ESLint の `sort-imports` 警告に合わせてグループ化し、CSS/SCSS は Stylelint の規約を守りつつ `:deep` 等の擬似クラスは必要最小限とします。インターフェース名の `I` 接頭辞は禁止です。
 
-# Note: npm is disabled (npm=0.0.0 in engines)
-```
+## テスト方針
 
-### Development Server
+テストは Vitest + @vue/test-utils を標準とし、`tests/unit` と `tests/components` にシナリオを配置してください。モック API には MSW を利用し、ネットワーク呼び出しを再現します。UI とサーバーハンドラ双方で境界条件をカバーし、主要コンポーネントで 80% 以上の statement カバレッジ維持を目標とします。テストファイル名は `<対象>.spec.ts` を推奨し、実行前に `yarn type-check` で型崩れを防ぎます。
 
-```bash
-# Start dev server at http://localhost:3000
-yarn dev
-```
+## コミットとプルリクエスト
 
-### Building & Production
+コミットメッセージは `feat:`, `fix:`, `chore:` などの Conventional Commits を日本語本文で統一し、必要に応じてチケット番号を後段に付記します。プルリクエストでは概要、テスト結果（実行コマンドやスクリーンショット）、関連 Issue のリンクを記載し、UI 変更時は主要画面のキャプチャを添付してください。レビュワーが確認しやすいよう、差分は機能単位で粒度を揃え、ドラフト状態で早期共有する運用を推奨します。
 
-```bash
-# Build for production
-yarn build
+## セキュリティと設定ヒント
 
-# Preview production build
-yarn preview
-
-# Generate static site
-yarn generate
-```
-
-### Type Checking & Linting
-
-```bash
-# Type check
-yarn type-check
-
-# ESLint
-yarn lint
-yarn lint:fix
-
-# Stylelint (checks src/**/*.{vue,scss,css})
-yarn lint:css
-yarn lint:css:fix
-
-# Format all files
-yarn format
-```
-
-## Architecture
-
-### Tech Stack
-
-- **Framework**: Nuxt 4
-- **Language**: TypeScript with strict compiler options (noUnusedLocals, noUnusedParameters, noFallthroughCasesInSwitch)
-- **Styling**: Tailwind CSS + SCSS
-- **Maps**: Google Maps JavaScript API
-- **API**: HotPepper Gourmet API (server-side proxy via Nitro)
-- **Package Manager**: Yarn 4 (Berry)
-
-### Application Structure
-
-3-screen flow:
-
-1. **TOP**: Search form + "Hot nearby restaurants" carousel
-2. **Search Results**: List/map toggle view with pagination
-3. **Detail**: Restaurant details + HotPepper link
-
-### Data Flow
-
-- Client → Nitro server endpoints → HotPepper Gourmet API
-- Server-only API key (`NUXT_HOTPEPPER_API_KEY`) never exposed to client
-- Google Maps API key exposed via `NUXT_PUBLIC_GOOGLE_MAPS_API_KEY`
-
-## Environment Setup
-
-Copy `.env.example` to `.env` and set required API keys:
-
-- `NUXT_HOTPEPPER_API_KEY` (server-only, required)
-- `NUXT_PUBLIC_GOOGLE_MAPS_API_KEY` (client-exposed, required)
-- `NUXT_LOG_LEVEL` (optional, defaults to `info`)
-- `NUXT_LOG_ENABLE_ACCESS` (optional, defaults to `true`)
-
-## Code Style & Conventions
-
-### ESLint Rules
-
-- **Import sorting**: `sort-imports` enabled (warns on unsorted member imports)
-- **Naming**: No `I` prefix for interfaces/types (enforced via `@typescript-eslint/naming-convention`)
-- **Vue components**:
-  - PascalCase in templates (registered components only)
-  - File names must match component names (case-sensitive)
-  - Scoped or module styles enforced
-  - `v-html` usage is an error
-
-### Stylelint
-
-- Uses `stylelint-config-standard-scss`
-- Vue SFC-specific overrides for `:deep`, `:global`, `:slotted` pseudo-classes
-- Integrated with Prettier via `stylelint-prettier`
-
-### Prettier
-
-- No semicolons (`semi: false`)
-- Single quotes (`singleQuote: true`)
-- Print width: 100 characters
-
-### Git Hooks
-
-- Pre-commit: Husky + lint-staged
-  - Auto-fixes ESLint errors on `*.{js,ts,vue}`
-  - Formats all files with Prettier
-
-### Commit Messages
-
-- Use conventional commits format with `chore:`, `feat:`, `fix:`, etc.
-- Keep messages concise and in Japanese when appropriate
-- Examples: `chore: prepare environment config`, `feat: 検索機能を追加`
-
-## Target Environment
-
-- Modern browsers (Chrome/Edge/Firefox/Safari latest versions)
-- Desktop-focused (mobile not in scope for this tech validation)
-- WCAG 2.2 Level A accessibility target
-- SEO optimized (title/description/OGP for each page)
+`.env` を `.env.example` から複製し、`NUXT_HOTPEPPER_API_KEY` と `NUXT_PUBLIC_GOOGLE_MAPS_API_KEY` を必ず設定してください。API キーはローカル環境でのみ保持し、リポジトリへコミットしないでください。`NUXT_LOG_LEVEL` や `NUXT_LOG_ENABLE_ACCESS` で Nitro のログ量を調整し、ステージングではアクセスログを残す構成を推奨します。Google Maps キーは Referer 制限を有効にし、開発用途と本番用途を分離してください。
