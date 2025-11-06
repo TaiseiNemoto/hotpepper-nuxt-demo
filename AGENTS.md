@@ -23,3 +23,7 @@ TypeScript は strict 設定で未使用変数を禁止します。Prettier 設�
 ## セキュリティと設定ヒント
 
 `.env` を `.env.example` から複製し、`NUXT_HOTPEPPER_API_KEY` と `NUXT_PUBLIC_GOOGLE_MAPS_API_KEY` を必ず設定してください。API キーはローカル環境でのみ保持し、リポジトリへコミットしないでください。`NUXT_LOG_LEVEL` や `NUXT_LOG_ENABLE_ACCESS` で Nitro のログ量を調整し、ステージングではアクセスログを残す構成を推奨します。Google Maps キーは Referer 制限を有効にし、開発用途と本番用途を分離してください。
+
+## エージェント運用ルール
+
+作業完了前に yarn type-check・yarn lint・yarn lint:css・yarn format --check など必要な型チェック／Lint／フォーマット検証を実行し、エラーは恒久対応で解消してください。コミットは指示があるまで実施せず、レビュー前の状態ではローカル変更のままキープします。
