@@ -61,6 +61,7 @@ yarn format
 
 - **Framework**: Nuxt 4
 - **Language**: TypeScript with strict compiler options (noUnusedLocals, noUnusedParameters, noFallthroughCasesInSwitch)
+- **Testing**: Vitest + @nuxt/test-utils (Nuxt environment)
 - **Styling**: Tailwind CSS + SCSS
 - **Maps**: Google Maps JavaScript API
 - **API**: HotPepper Gourmet API (server-side proxy via Nitro)
@@ -124,6 +125,19 @@ Copy `.env.example` to `.env` and set required API keys:
 - Use conventional commits format with `chore:`, `feat:`, `fix:`, etc.
 - Keep messages concise and in Japanese when appropriate
 - Examples: `chore: prepare environment config`, `feat: 検索機能を追加`
+
+### Testing Conventions
+
+- **Test case descriptions**: Write `describe()` and `it()` descriptions **in Japanese** for better readability
+- Test file naming: Use `<target>.test.ts` or `<target>.spec.ts`
+- Example:
+  ```typescript
+  describe('ログユーティリティ', () => {
+    it('有効なログレベル文字列を正しく返す', () => {
+      // test implementation
+    })
+  })
+  ```
 
 ## Claude Code Guidelines
 

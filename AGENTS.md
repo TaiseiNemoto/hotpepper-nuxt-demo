@@ -14,7 +14,9 @@ TypeScript は strict 設定で未使用変数を禁止します。Prettier 設�
 
 ## テスト方針
 
-テストは Vitest + @vue/test-utils を標準とし、`tests/unit` と `tests/components` にシナリオを配置してください。モック API には MSW を利用し、ネットワーク呼び出しを再現します。UI とサーバーハンドラ双方で境界条件をカバーし、主要コンポーネントで 80% 以上の statement カバレッジ維持を目標とします。テストファイル名は `<対象>.spec.ts` を推奨し、実行前に `yarn type-check` で型崩れを防ぎます。
+テストは **Vitest + @nuxt/test-utils** を標準とし、Nuxt環境（`environment: 'nuxt'`）でテストを実行します。`tests/` 配下にシナリオを配置し、必要に応じて `tests/unit`, `tests/components`, `tests/server` などでディレクトリを分割してください。モック API には MSW を利用し、ネットワーク呼び出しを再現します。UI とサーバーハンドラ双方で境界条件をカバーし、主要コンポーネントで 80% 以上の statement カバレッジ維持を目標とします。テストファイル名は `<対象>.test.ts` または `<対象>.spec.ts` を推奨し、実行前に `yarn type-check` で型崩れを防ぎます。
+
+**テストケースの記述言語**: `describe()` と `it()` の説明文は**必ず日本語**で記述してください。可読性とチーム内での理解を優先します。コード内のコメントも日本語推奨です。
 
 ## コミットとプルリクエスト
 
