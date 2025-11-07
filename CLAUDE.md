@@ -123,8 +123,10 @@ Copy `.env.example` to `.env` and set required API keys:
 ### Commit Messages
 
 - Use conventional commits format with `chore:`, `feat:`, `fix:`, etc.
-- Keep messages concise and in Japanese when appropriate
-- Examples: `chore: prepare environment config`, `feat: 検索機能を追加`
+- **Keep messages simple and concise** (one-line summary preferred)
+- Write in Japanese when appropriate
+- Detailed explanations belong in PR descriptions, not commit messages
+- Examples: `feat: ログユーティリティのテストを実装`, `fix: ログレベルフィルタリングを修正`
 
 ### Testing Conventions
 
