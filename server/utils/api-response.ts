@@ -74,3 +74,22 @@ export const respondWithUpstreamError = (event: H3Event, error: ApiError, fallba
   setResponseStatus(event, error.statusCode ?? fallback)
   return createFailureResult(error)
 }
+
+/**
+ * getValidatedQuery などが生成する H3Error から ValidationError を取り出す
+ */
+export const extractValidationError = (error: unknown): ValidationError | null => {
+  if (error instanceof ValidationError) {
+    return error
+  }
+  if (error && typeof error === 'object') {
+    const { data, cause } = error as { data?: unknown; cause?: unknown }
+    if (data instanceof ValidationError) {
+      return data
+    }
+    if (cause instanceof ValidationError) {
+      return cause
+    }
+  }
+  return null
+}

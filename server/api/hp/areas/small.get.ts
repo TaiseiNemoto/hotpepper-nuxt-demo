@@ -2,6 +2,7 @@ import { defineEventHandler, getValidatedQuery } from 'h3'
 import { createHotpepperClient } from '../../../utils/hotpepper-client'
 import {
   ValidationError,
+  extractValidationError,
   respondWithUpstreamError,
   respondWithValidationError,
 } from '../../../utils/api-response'
@@ -18,8 +19,9 @@ export default defineEventHandler(async (event) => {
       parseSmallAreaQuery(raw),
     )
   } catch (error) {
-    if (error instanceof ValidationError) {
-      return respondWithValidationError(event, error)
+    const validationError = extractValidationError(error)
+    if (validationError) {
+      return respondWithValidationError(event, validationError)
     }
     throw error
   }

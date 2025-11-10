@@ -2,6 +2,7 @@ import { defineEventHandler, getValidatedQuery } from 'h3'
 import { type ShopSearchParams, createHotpepperClient } from '../../../utils/hotpepper-client'
 import {
   ValidationError,
+  extractValidationError,
   respondWithUpstreamError,
   respondWithValidationError,
 } from '../../../utils/api-response'
@@ -41,8 +42,9 @@ export default defineEventHandler(async (event) => {
       normalizeSearchQuery(asRecord(query)),
     )
   } catch (error) {
-    if (error instanceof ValidationError) {
-      return respondWithValidationError(event, error)
+    const validationError = extractValidationError(error)
+    if (validationError) {
+      return respondWithValidationError(event, validationError)
     }
     throw error
   }

@@ -253,7 +253,7 @@ describe('NitroLogger', () => {
       logger.info('test message')
 
       expect(mockWrite).toHaveBeenCalledTimes(1)
-      const [line, level] = mockWrite.mock.calls[0]
+      const [line, level] = mockWrite.mock.calls[0]!
 
       // [timestamp] [level] [category] message
       expect(line).toMatch(/^\[2025-11-07T12:34:56\+09:00\] \[INFO\] \[SYSTEM\] test message$/)
@@ -326,12 +326,12 @@ describe('NitroLogger', () => {
 
     it('元のロガーに影響を与えない', () => {
       const baseLogger = NitroLogger.create({ minLevel: 'DEBUG' }, mockWrite)
-      const _apiLogger = baseLogger.withCategory('API')
+      baseLogger.withCategory('API')
 
       // Use original logger
       baseLogger.info('base log')
 
-      const [line] = mockWrite.mock.calls[0]
+      const [line] = mockWrite.mock.calls[0]!
       expect(line).toContain('[SYSTEM]')
       expect(line).not.toContain('[API]')
     })
@@ -372,11 +372,11 @@ describe('NitroLogger', () => {
 
     it('元のロガーに影響を与えない', () => {
       const baseLogger = NitroLogger.create({ minLevel: 'DEBUG' }, mockWrite)
-      const _extendedLogger = baseLogger.withMetadata({ extra: 'value' })
+      baseLogger.withMetadata({ extra: 'value' })
 
       baseLogger.info('test')
 
-      const [line] = mockWrite.mock.calls[0]
+      const [line] = mockWrite.mock.calls[0]!
       expect(line).not.toContain('extra')
     })
 
