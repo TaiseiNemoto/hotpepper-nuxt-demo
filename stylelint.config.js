@@ -62,5 +62,12 @@ export default {
     // Disable some "stylelint-config-standard" rules.
     'selector-class-pattern': null,
     // ------------------------------
+    // Tailwind CSS support
+    'scss/at-rule-no-unknown': [
+      true,
+      {
+        ignoreAtRules: ['tailwind', 'apply', 'layer', 'variants', 'responsive', 'screen'],
+      },
+    ],
   },
 }

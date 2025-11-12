@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-primary: #ff7a00;
+  --color-secondary: #1f2933;
+  --color-error: #dc2626;
+  --color-success: #059669;
+  --color-warning: #d97706;
+}
+
+@layer base {
+  body {
+    font-family: 'Noto Sans JP', system-ui, sans-serif;
+
+    @apply bg-gray-50 text-gray-900;
+  }
+}
