@@ -41,6 +41,9 @@ export default withNuxt(
       ],
       'vue/no-v-html': 'error',
       'vue/enforce-style-attribute': ['error', { allow: ['scoped', 'module'] }],
+      // Prettierとの競合を避けるため、フォーマット関連のルールを無効化
+      'vue/first-attribute-linebreak': 'off',
+      'vue/html-self-closing': 'off',
     },
   },
 )
