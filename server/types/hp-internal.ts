@@ -1,4 +1,4 @@
-// 内部API（/api/hp/*）がクライアントへ返却する共通型
+// 内部API（/api/hp/*）をクライアント用に変換した型
 export interface ShopSummary {
   id: string
   name: string
@@ -45,7 +45,7 @@ export interface ShopDetailResponse {
   notFound?: boolean
 }
 
-// HP-03 ジャンルマスタレスポンス
+// HP-03 ジャンルマスターレスポンス
 export interface GenresResponse {
   total: number
   returned: number
@@ -53,7 +53,7 @@ export interface GenresResponse {
   genres: { code: string; name: string }[]
 }
 
-// HP-04 大エリアマスタレスポンス
+// HP-04 大エリアマスターレスポンス
 export interface LargeAreasResponse {
   total: number
   returned: number
@@ -61,7 +61,7 @@ export interface LargeAreasResponse {
   areas: { code: string; name: string }[]
 }
 
-// HP-05 中エリアマスタレスポンス
+// HP-05 中エリアマスターレスポンス
 export interface MiddleAreasResponse {
   total: number
   returned: number
@@ -73,7 +73,7 @@ export interface MiddleAreasResponse {
   }[]
 }
 
-// HP-06 小エリアマスタレスポンス
+// HP-06 小エリアマスターレスポンス
 export interface SmallAreasResponse {
   total: number
   returned: number
