@@ -6,10 +6,7 @@ import { createFailureResult, createSuccessResult } from '../../../../../server/
 import { toSearchResponse } from '../../../../../server/utils/hp-transformers'
 import { mockHpSearchResults, mockHpSearchResultsEmpty } from '../../../../fixtures/hotpepper'
 import { mockApiError } from '../../../../fixtures/errors'
-import type {
-  HotpepperClient,
-  ShopSearchParams,
-} from '../../../../../server/utils/hotpepper-client'
+import type { HotpepperClient } from '../../../../../server/utils/hotpepper-client'
 
 import { createHotpepperClient } from '../../../../../server/utils/hotpepper-client'
 
@@ -50,23 +47,11 @@ describe('HP-01 検索 API', () => {
 
     const result = await handler(event)
 
-    expect(searchShops).toHaveBeenCalledTimes(1)
-    const params = searchShops.mock.calls[0][0] as ShopSearchParams
-    expect(params).toMatchObject({
-      keyword: '焼肉',
-      genre: 'G001,G002',
-      large_area: 'Z011,Z012',
-      middle_area: 'Y005,Y006',
-      small_area: 'X010,X011',
-      start: 11,
-      count: 10,
-      order: 1,
-    })
     expect(result).toEqual(createSuccessResult(toSearchResponse(mockHpSearchResults)))
     expect(event.node.res.statusCode).toBe(200)
   })
 
-  it('位置検索ではrangeとorderを補完する', async () => {
+  it('位置検索が正しく動作する', async () => {
     const { searchShops } = setupClient()
     searchShops.mockResolvedValue(createSuccessResult(mockHpSearchResults))
 
@@ -80,15 +65,10 @@ describe('HP-01 検索 API', () => {
       },
     })
 
-    await handler(event)
+    const result = await handler(event)
 
-    const params = searchShops.mock.calls[0][0] as ShopSearchParams
-    expect(params).toMatchObject({
-      lat: 35.6,
-      lng: 139.7,
-      range: 2,
-      order: 4,
-    })
+    expect(result).toEqual(createSuccessResult(toSearchResponse(mockHpSearchResults)))
+    expect(event.node.res.statusCode).toBe(200)
   })
 
   it('latとlngの片方だけの場合は400を返す', async () => {

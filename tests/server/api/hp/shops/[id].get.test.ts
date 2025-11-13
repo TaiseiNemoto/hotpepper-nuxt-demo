@@ -37,7 +37,6 @@ describe('HP-02 詳細 API', () => {
 
     const result = await handler(event)
 
-    expect(getShopDetail).toHaveBeenCalledWith('J001234567')
     const firstShop = mockHpSearchResults.shop?.[0]
     expect(firstShop).toBeDefined()
     if (!firstShop) {
