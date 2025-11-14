@@ -84,3 +84,17 @@ export interface SmallAreasResponse {
     parentMiddle?: { code: string; name: string }
   }[]
 }
+
+// マスタデータ型エイリアス（SearchForm等で使用）
+export type Genre = { code: string; name: string }
+export type LargeArea = { code: string; name: string }
+export type MiddleArea = {
+  code: string
+  name: string
+  parentLarge: { code: string; name: string }
+}
+export type SmallArea = {
+  code: string
+  name: string
+  parentMiddle?: { code: string; name: string }
+}

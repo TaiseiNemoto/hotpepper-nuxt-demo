@@ -50,7 +50,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
 import type { ShopSummary } from '../../server/types/hp-internal'
 
 const props = defineProps<{

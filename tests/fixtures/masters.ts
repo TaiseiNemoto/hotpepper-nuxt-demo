@@ -26,9 +26,9 @@ export const mockLargeAreasResponse = {
 }
 
 export const mockMiddleAreas = [
-  { code: 'Y005', name: '渋谷', largeAreaCode: 'Z011' },
-  { code: 'Y007', name: '新宿', largeAreaCode: 'Z011' },
-  { code: 'Y010', name: '銀座・有楽町', largeAreaCode: 'Z011' },
+  { code: 'Y005', name: '渋谷', parentLarge: { code: 'Z011', name: '東京' } },
+  { code: 'Y007', name: '新宿', parentLarge: { code: 'Z011', name: '東京' } },
+  { code: 'Y010', name: '銀座・有楽町', parentLarge: { code: 'Z011', name: '東京' } },
 ]
 
 export const mockMiddleAreasResponse = {
@@ -36,9 +36,9 @@ export const mockMiddleAreasResponse = {
 }
 
 export const mockSmallAreas = [
-  { code: 'X010', name: '渋谷駅周辺', middleAreaCode: 'Y005' },
-  { code: 'X011', name: '神泉・代官山', middleAreaCode: 'Y005' },
-  { code: 'X012', name: '恵比寿・代官山', middleAreaCode: 'Y005' },
+  { code: 'X010', name: '渋谷駅周辺', parentMiddle: { code: 'Y005', name: '渋谷' } },
+  { code: 'X011', name: '神泉・代官山', parentMiddle: { code: 'Y005', name: '渋谷' } },
+  { code: 'X012', name: '恵比寿・代官山', parentMiddle: { code: 'Y005', name: '渋谷' } },
 ]
 
 export const mockSmallAreasResponse = {
