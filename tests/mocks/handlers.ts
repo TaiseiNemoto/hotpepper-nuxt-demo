@@ -107,7 +107,7 @@ export const handlers = [
     // largeAreaCodeでフィルタリング
     if (largeAreaCode) {
       const filtered = mockMiddleAreasResponse.areas.filter(
-        (area) => area.largeAreaCode === largeAreaCode,
+        (area) => area.parentLarge.code === largeAreaCode,
       )
       return HttpResponse.json({ areas: filtered })
     }
@@ -128,7 +128,7 @@ export const handlers = [
     // middleAreaCodeでフィルタリング
     if (middleAreaCode) {
       const filtered = mockSmallAreasResponse.areas.filter(
-        (area) => area.middleAreaCode === middleAreaCode,
+        (area) => area.parentMiddle?.code === middleAreaCode,
       )
       return HttpResponse.json({ areas: filtered })
     }

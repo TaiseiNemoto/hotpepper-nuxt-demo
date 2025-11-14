@@ -31,6 +31,7 @@ export default defineNuxtConfig({
 
   typescript: {
     tsConfig: {
+      include: ['../tests/**/*'],
       compilerOptions: {
         noUnusedLocals: true,
         noUnusedParameters: true,
