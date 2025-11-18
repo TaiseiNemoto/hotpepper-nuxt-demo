@@ -141,6 +141,20 @@ Copy `.env.example` to `.env` and set required API keys:
   })
   ```
 
+### Responsive Design
+
+- **Desktop-focused design**: Mobile and tablet devices (< 1024px) are out of scope
+- **Minimum viewport width**: 1024px (Tailwind `lg` breakpoint)
+- **No mobile breakpoints**: Do NOT use `sm:` (640px) or `md:` (768px) breakpoints
+- **Desktop-only styling**: Apply styles directly without mobile-first breakpoints
+- **Large display considerations**: Not required (no special handling for > 1920px)
+- **Example**:
+
+  ```vue
+  <!-- ❌ Avoid mobile breakpoints -->
+  <div class="px-6 md:px-12"></div>
+  ```
+
 ## Claude Code Guidelines
 
 ### Quality Assurance Workflow
@@ -168,6 +182,7 @@ If errors are found:
 ## Target Environment
 
 - Modern browsers (Chrome/Edge/Firefox/Safari latest versions)
-- Desktop-focused (mobile not in scope for this tech validation)
+- Desktop-focused (minimum viewport width: 1024px)
+- Mobile and tablet devices (< 1024px) are out of scope
 - WCAG 2.2 Level A accessibility target
 - SEO optimized (title/description/OGP for each page)

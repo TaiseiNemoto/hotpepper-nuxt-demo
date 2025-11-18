@@ -17,3 +17,15 @@
     @apply bg-gray-50 text-gray-900;
   }
 }
+
+@layer utilities {
+  /* スクロールバーを非表示にするユーティリティクラス */
+  .scrollbar-hide {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+}
