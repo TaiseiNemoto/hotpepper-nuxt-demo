@@ -1,3 +1,5 @@
+<script setup lang="ts"></script>
+
 <template>
   <div class="flex min-h-screen flex-col bg-gray-50 text-gray-900">
     <AppHeader />

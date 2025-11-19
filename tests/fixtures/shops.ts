@@ -12,9 +12,9 @@ export const mockShopSummary = {
   genre: { code: 'G001', name: '居酒屋' },
   catch: '美味しい料理とお酒を楽しめるお店',
   photo: {
-    s: 'https://example.com/photo_s.jpg',
-    m: 'https://example.com/photo_m.jpg',
-    l: 'https://example.com/photo_l.jpg',
+    s: 'https://placehold.co/100x100/f97316/white?text=Shop',
+    m: 'https://placehold.co/200x200/f97316/white?text=Shop',
+    l: 'https://placehold.co/400x400/f97316/white?text=Shop',
   },
   urlPc: 'https://www.hotpepper.jp/strJ001234567/',
 }

@@ -1,3 +1,54 @@
+<script setup lang="ts">
+import { AREA_LIMITS, useAreaSelection } from '../composables/useAreaSelection'
+import type { LargeArea, MiddleArea, SmallArea } from '../../server/types/hp-internal'
+
+const props = defineProps<{
+  largeAreas: LargeArea[]
+  middleAreas: MiddleArea[]
+  smallAreas: SmallArea[]
+}>()
+
+const emit = defineEmits<{
+  'update:selectedLargeAreas': [value: string[]]
+  'update:selectedMiddleAreas': [value: string[]]
+  'update:selectedSmallAreas': [value: string[]]
+}>()
+
+const {
+  selectedLargeAreas,
+  selectedMiddleAreas,
+  selectedSmallAreas,
+  largeAreaToAdd,
+  middleAreaToAdd,
+  smallAreaToAdd,
+  availableLargeAreas,
+  availableMiddleAreas,
+  availableSmallAreas,
+  getLargeAreaName,
+  getMiddleAreaName,
+  getSmallAreaName,
+  addLargeArea,
+  addMiddleArea,
+  addSmallArea,
+  removeLargeArea,
+  removeMiddleArea,
+  removeSmallArea,
+} = useAreaSelection(props.largeAreas, props.middleAreas, props.smallAreas)
+
+// 選択された値を親に通知
+watch(selectedLargeAreas, (newValue) => {
+  emit('update:selectedLargeAreas', newValue)
+})
+
+watch(selectedMiddleAreas, (newValue) => {
+  emit('update:selectedMiddleAreas', newValue)
+})
+
+watch(selectedSmallAreas, (newValue) => {
+  emit('update:selectedSmallAreas', newValue)
+})
+</script>
+
 <template>
   <div>
     <label class="mb-2 block text-sm font-medium text-gray-700">エリア</label>
@@ -56,7 +107,7 @@
           id="sf-large-area"
           v-model="largeAreaToAdd"
           :disabled="selectedLargeAreas.length >= AREA_LIMITS.LARGE_AREAS"
-          class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm transition focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-200 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500"
+          class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm transition focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-200 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500"
           @change="addLargeArea"
         >
           <option value="">大エリアを選択...</option>
@@ -79,7 +130,7 @@
             selectedLargeAreas.length === 0 ||
             selectedMiddleAreas.length >= AREA_LIMITS.MIDDLE_AREAS
           "
-          class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm transition focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-200 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500"
+          class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm transition focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-200 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500"
           @change="addMiddleArea"
         >
           <option value="">中エリアを選択...</option>
@@ -101,7 +152,7 @@
           :disabled="
             selectedMiddleAreas.length === 0 || selectedSmallAreas.length >= AREA_LIMITS.SMALL_AREAS
           "
-          class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm transition focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-200 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500"
+          class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm transition focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-200 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500"
           @change="addSmallArea"
         >
           <option value="">小エリアを選択...</option>
@@ -113,54 +164,3 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-import { AREA_LIMITS, useAreaSelection } from '../composables/useAreaSelection'
-import type { LargeArea, MiddleArea, SmallArea } from '../../server/types/hp-internal'
-
-const props = defineProps<{
-  largeAreas: LargeArea[]
-  middleAreas: MiddleArea[]
-  smallAreas: SmallArea[]
-}>()
-
-const emit = defineEmits<{
-  'update:selectedLargeAreas': [value: string[]]
-  'update:selectedMiddleAreas': [value: string[]]
-  'update:selectedSmallAreas': [value: string[]]
-}>()
-
-const {
-  selectedLargeAreas,
-  selectedMiddleAreas,
-  selectedSmallAreas,
-  largeAreaToAdd,
-  middleAreaToAdd,
-  smallAreaToAdd,
-  availableLargeAreas,
-  availableMiddleAreas,
-  availableSmallAreas,
-  getLargeAreaName,
-  getMiddleAreaName,
-  getSmallAreaName,
-  addLargeArea,
-  addMiddleArea,
-  addSmallArea,
-  removeLargeArea,
-  removeMiddleArea,
-  removeSmallArea,
-} = useAreaSelection(props.largeAreas, props.middleAreas, props.smallAreas)
-
-// 選択された値を親に通知
-watch(selectedLargeAreas, (newValue) => {
-  emit('update:selectedLargeAreas', newValue)
-})
-
-watch(selectedMiddleAreas, (newValue) => {
-  emit('update:selectedMiddleAreas', newValue)
-})
-
-watch(selectedSmallAreas, (newValue) => {
-  emit('update:selectedSmallAreas', newValue)
-})
-</script>

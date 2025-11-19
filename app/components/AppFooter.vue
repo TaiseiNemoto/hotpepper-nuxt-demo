@@ -1,3 +1,5 @@
+<script setup lang="ts"></script>
+
 <template>
   <footer class="bg-gray-800 text-white">
     <div class="mx-auto max-w-7xl px-4 py-6">

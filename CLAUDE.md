@@ -97,6 +97,7 @@ Copy `.env.example` to `.env` and set required API keys:
 - **Import sorting**: `sort-imports` enabled (warns on unsorted member imports)
 - **Naming**: No `I` prefix for interfaces/types (enforced via `@typescript-eslint/naming-convention`)
 - **Vue components**:
+  - **SFC block order**: `<script setup>` → `<template>` → `<style>` (Nuxt convention)
   - PascalCase in templates (registered components only)
   - File names must match component names (case-sensitive)
   - Scoped or module styles enforced
