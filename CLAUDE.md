@@ -103,6 +103,22 @@ Copy `.env.example` to `.env` and set required API keys:
   - Scoped or module styles enforced
   - `v-html` usage is an error
 
+### Client-Side Rendering Components
+
+- **Use `<ClientOnly>` wrapper instead of `.client.vue` suffix**
+  - Browser-only APIs (Google Maps, Geolocation, etc.) should be wrapped with `<ClientOnly>`
+  - Always provide fallback UI using the `#fallback` slot to prevent layout shift
+  - Example:
+    ```vue
+    <ClientOnly>
+      <ResultMap :shops="shops" />
+      <template #fallback>
+        <div class="h-[600px] bg-gray-100 animate-pulse rounded-xl" />
+      </template>
+    </ClientOnly>
+    ```
+  - **Rationale**: Maintains consistency across the codebase and provides better UX with skeleton loaders
+
 ### Stylelint
 
 - Uses `stylelint-config-standard-scss`
