@@ -6,7 +6,7 @@ const props = defineProps<{
 }>()
 
 const detailPath = computed(() => `/shops/${props.shop.id}`)
-const imageSrc = computed(() => props.shop.photo?.m ?? props.shop.photo?.s ?? '')
+const imageSrc = computed(() => props.shop.photo?.m ?? '')
 const hasImage = computed(() => Boolean(imageSrc.value))
 const altText = computed(() => `${props.shop.name} の写真`)
 const genreLabel = computed(() => props.shop.genre?.name ?? 'ジャンル未設定')
