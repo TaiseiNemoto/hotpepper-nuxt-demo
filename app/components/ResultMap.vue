@@ -5,14 +5,14 @@
  * Google Maps APIを使用するため、<ClientOnly>でラップして使用すること
  */
 import type { ShopSummary } from '../../server/types/hp-internal'
+import { escapeHtml } from '~/utils/html'
 
 const props = defineProps<{
   /** 地図上に表示する店舗リスト */
   shops: ShopSummary[]
 }>()
 
-const config = useRuntimeConfig()
-const apiKey = config.public.googleMapsApiKey
+const { apiKey, waitForGoogleMaps } = useGoogleMaps()
 
 // 地図のDOM参照
 const mapContainer = ref<HTMLElement | null>(null)
@@ -24,31 +24,6 @@ const infoWindow = ref<google.maps.InfoWindow | null>(null)
 // APIロード状態
 const isLoading = ref(true)
 const hasError = ref(false)
-
-/**
- * Google Maps APIスクリプトを読み込み
- */
-useHead({
-  script: [
-    {
-      src: `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=marker`,
-      async: true,
-      defer: true,
-    },
-  ],
-})
-
-/**
- * HTML文字列をエスケープしてXSS攻撃を防ぐ
- */
-const escapeHtml = (str: string): string => {
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;')
-}
 
 /**
  * 住所を市区町村レベルまで短縮（日本語住所専用）
@@ -159,29 +134,6 @@ const initializeMap = async () => {
     hasError.value = true
     isLoading.value = false
   }
-}
-
-/**
- * Google Maps APIの読み込みを待機
- */
-const waitForGoogleMaps = (): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    const maxAttempts = 50
-    let attempts = 0
-
-    const checkGoogleMaps = () => {
-      if (typeof google !== 'undefined' && google.maps) {
-        resolve()
-      } else if (attempts >= maxAttempts) {
-        reject(new Error('Google Maps API の読み込みがタイムアウトしました'))
-      } else {
-        attempts++
-        setTimeout(checkGoogleMaps, 100)
-      }
-    }
-
-    checkGoogleMaps()
-  })
 }
 
 /**
