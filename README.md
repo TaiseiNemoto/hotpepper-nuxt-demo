@@ -66,3 +66,53 @@ yarn preview
 ```
 
 Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+
+## Application Overview
+
+This is a restaurant search application powered by HotPepper Gourmet API, built with Nuxt 4 (SSR/CSR hybrid).
+
+### Pages
+
+- **TOP (`/`)**: Hero section, search form, and nearby hot restaurants carousel
+- **Search Results (`/shops`)**: Restaurant list with map/list toggle view and pagination
+- **Detail (`/shops/[id]`)**: Restaurant details with Google Maps integration
+
+### Components
+
+#### Layout Components
+
+- `AppHeader.vue`: Application header with logo and navigation
+- `AppFooter.vue`: Application footer with credits and links
+
+#### Search Components
+
+- `SearchForm.vue`: Main search form with keyword, genre, and area selectors
+- `SearchKeywordField.vue`: Keyword input field
+- `SearchGenreSelector.vue`: Genre selection UI (max 2)
+- `SearchAreaSelector.vue`: Hierarchical area selection (large/middle/small)
+
+#### Shop Display Components
+
+- `ShopCard.vue`: Restaurant card component (thumbnail, name, genre, catch copy)
+- `ShopHeader.vue`: Restaurant detail header
+- `ShopInfoGrid.vue`: Restaurant information grid (address, hours, budget, etc.)
+- `ShopMap.vue`: Single restaurant map with marker
+
+#### List/Map Components
+
+- `ResultList.vue`: Restaurant list view with skeleton loading
+- `ResultMap.vue`: Multiple restaurants map with markers and info windows
+- `PaginationControl.vue`: Pagination control with compact display
+
+#### Other Components
+
+- `HeroSection.vue`: TOP page hero section
+- `NearbyHotCarousel.vue`: Nearby hot restaurants carousel with geolocation
+
+#### Icon Components
+
+- `icons/XIcon.vue`: Close/delete icon
+
+## Code Quality
+
+All code follows strict TypeScript, ESLint, Stylelint, and Prettier configurations. Pre-commit hooks ensure code quality with lint-staged and Husky.
