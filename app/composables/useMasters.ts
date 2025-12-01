@@ -137,6 +137,8 @@ export const useMiddleAreas = (largeAreaCode?: MaybeRef<string | undefined>) => 
 /**
  * 小エリアマスタ取得
  * HP-06: 小エリアマスタ取得
+ *
+ * @param middleAreaCode 中エリアコード（必須）。未指定の場合はリクエストを送信しない。
  */
 export const useSmallAreas = (middleAreaCode?: MaybeRef<string | undefined>) => {
   const code = computed(() => unref(middleAreaCode))
@@ -160,8 +162,8 @@ export const useSmallAreas = (middleAreaCode?: MaybeRef<string | undefined>) => 
     query,
     // SSRで実行（初期データ取得）
     server: true,
-    // クライアント側でもキャッシュを利用
-    lazy: false,
+    // middleAreaCodeが未指定の場合は初期ロードをスキップ
+    lazy: !code.value,
     // middleAreaCodeが変更されたら自動的に再フェッチ
     watch: [code],
   })

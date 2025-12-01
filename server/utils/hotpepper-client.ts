@@ -214,16 +214,45 @@ export class HotpepperClient {
   ): Promise<T> {
     const signal = AbortSignal.timeout(this.timeoutMs)
     const startedAt = Date.now()
-    const response = await this.fetcher<HotpepperEnvelope<T>>(endpoint, {
+
+    let response = await this.fetcher<HotpepperEnvelope<T>>(endpoint, {
       query,
       signal,
     })
     const durationMs = Date.now() - startedAt
+
+    // ofetchがJSONをパースしない場合があるため、手動でパース
+    if (typeof response === 'string') {
+      try {
+        response = JSON.parse(response)
+      } catch (error) {
+        this.logger?.error('JSONパースに失敗', {
+          endpoint,
+          error: error instanceof Error ? error.message : String(error),
+        })
+        throw new Error(`JSONパースに失敗しました (endpoint: ${endpoint})`)
+      }
+    }
+
+    if (!response) {
+      throw new Error(`レスポンスが undefined です (endpoint: ${endpoint})`)
+    }
+
+    if (!response.results) {
+      this.logger?.error('レスポンスに results キーがありません', {
+        endpoint,
+        responseType: typeof response,
+        responseKeys: typeof response === 'object' ? Object.keys(response) : [],
+      })
+      throw new Error(`レスポンスに results キーがありません (endpoint: ${endpoint})`)
+    }
+
     this.logger?.debug('HotPepper APIレスポンス取得', {
       endpoint,
       durationMs,
       attempt,
     })
+
     return response.results
   }
 
