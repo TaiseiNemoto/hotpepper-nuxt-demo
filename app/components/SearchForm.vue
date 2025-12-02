@@ -65,7 +65,10 @@ const handleSubmit = () => {
 </script>
 
 <template>
-  <section class="w-full rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-100">
+  <section
+    data-test="search-form"
+    class="w-full rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-100"
+  >
     <h2 class="mb-6 text-xl font-semibold text-gray-900">店舗を検索</h2>
 
     <form class="space-y-6" @submit.prevent="handleSubmit">
