@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import type { ShopSummary } from '../../server/types/hp-internal'
-import { mockShopSummary } from '../../tests/fixtures/shops'
-
 // SEO設定
 useSeoMeta({
   title: 'トップ',
@@ -85,59 +82,44 @@ const retryLoadMasters = async () => {
   ])
 }
 
-// カルーセル用のモック店舗データ（10件生成）
-const nearbyShops = ref<ShopSummary[]>([])
-const isLoadingNearby = ref(false)
+// 周辺店舗データ取得（CSRのみ）
+const nearbyLocation = ref<{ lat: number; lng: number } | null>(null)
 
-// 10件の店舗データを生成
-const generateMockNearbyShops = (): ShopSummary[] => {
-  const shopNames = [
-    '渋谷居酒屋 本店',
-    'イタリアン ベラノッテ',
-    '中華料理 龍門',
-    '和食処 さくら',
-    '焼肉 牛角',
-    'フレンチビストロ ルミエール',
-    '韓国料理 ソウル',
-    'インド料理 タージマハル',
-    'スペイン料理 バル',
-    '創作料理 匠',
-  ]
+// 周辺店舗検索パラメータ
+const nearbySearchParams = computed(() => {
+  if (!nearbyLocation.value) return {}
+  return {
+    lat: nearbyLocation.value.lat,
+    lng: nearbyLocation.value.lng,
+    perPage: 10,
+    page: 1,
+  }
+})
 
-  const genres = [
-    { code: 'G001', name: '居酒屋' },
-    { code: 'G002', name: 'イタリアン・フレンチ' },
-    { code: 'G003', name: '中華' },
-    { code: 'G004', name: '和食' },
-    { code: 'G005', name: '焼肉・ホルモン' },
-    { code: 'G002', name: 'イタリアン・フレンチ' },
-    { code: 'G017', name: '韓国料理' },
-    { code: 'G007', name: 'アジア・エスニック料理' },
-    { code: 'G006', name: 'ダイニングバー・バル' },
-    { code: 'G001', name: '居酒屋' },
-  ]
+const {
+  shops: nearbyShops,
+  isLoading: isLoadingNearby,
+  apiError: nearbyApiError,
+  errorMessage: nearbyErrorMessage,
+  execute: fetchNearbyShops,
+} = useShopSearch(nearbySearchParams, {
+  server: false,
+  immediate: false,
+})
 
-  return shopNames.map((name, index) => ({
-    ...mockShopSummary,
-    id: `J00123456${index}`,
-    name,
-    genre: genres[index],
-    catch: `${name}の美味しい料理をお楽しみください`,
-    lat: mockShopSummary.lat + (Math.random() - 0.5) * 0.01,
-    lng: mockShopSummary.lng + (Math.random() - 0.5) * 0.01,
-  }))
-}
+const nearbyHasError = computed(() => !!nearbyApiError.value)
 
 // 位置情報取得時のハンドラ
-const handleLocationObtained = (_location: { lat: number; lng: number }) => {
-  // モック実装: 実際のAPI呼び出しは3.3フェーズで実施
-  isLoadingNearby.value = true
+const handleLocationObtained = async (location: { lat: number; lng: number }) => {
+  nearbyLocation.value = location
+  await fetchNearbyShops()
+}
 
-  // ローディング状態をシミュレート
-  setTimeout(() => {
-    nearbyShops.value = generateMockNearbyShops()
-    isLoadingNearby.value = false
-  }, 500)
+// 周辺店舗検索のリトライ
+const retryNearbySearch = async () => {
+  if (nearbyLocation.value) {
+    await fetchNearbyShops()
+  }
 }
 </script>
 
@@ -195,7 +177,10 @@ const handleLocationObtained = (_location: { lat: number; lng: number }) => {
     <NearbyHotCarousel
       :shops="nearbyShops"
       :is-loading="isLoadingNearby"
+      :has-error="nearbyHasError"
+      :error-message="nearbyErrorMessage"
       @location-obtained="handleLocationObtained"
+      @retry="retryNearbySearch"
     />
   </div>
 </template>

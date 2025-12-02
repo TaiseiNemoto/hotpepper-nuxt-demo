@@ -5,19 +5,23 @@ const props = withDefaults(
   defineProps<{
     shops: ShopSummary[]
     isLoading?: boolean
+    hasError?: boolean
+    errorMessage?: string | null
   }>(),
   {
     isLoading: false,
+    hasError: false,
+    errorMessage: null,
   },
 )
 
 const emit = defineEmits<{
   'location-obtained': [location: { lat: number; lng: number }]
+  retry: []
 }>()
 
 // 位置情報の状態
 const geolocationGranted = ref(false)
-const geolocationError = ref(false)
 
 // カルーセルの状態
 const carouselContainer = ref<HTMLDivElement | null>(null)
@@ -47,18 +51,14 @@ const requestGeolocation = async () => {
     })
 
     geolocationGranted.value = true
-    geolocationError.value = false
 
     emit('location-obtained', {
       lat: position.coords.latitude,
       lng: position.coords.longitude,
     })
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- API結合フェーズ(3.3)でエラーハンドリング実装時に使用予定
-  } catch (error) {
+  } catch {
     // 位置情報の取得に失敗した場合はセクション全体を非表示にする
     geolocationGranted.value = false
-    // geolocationErrorは将来のAPI結合フェーズでデータ取得エラー用に使用
-    geolocationError.value = false
   }
 }
 
@@ -144,15 +144,27 @@ onMounted(() => {
 
       <!-- エラー状態 -->
       <div
-        v-if="geolocationError"
-        class="rounded-xl border border-error bg-error/5 p-6 text-center"
+        v-if="props.hasError"
+        class="rounded-xl border border-error bg-error/5 p-8 text-center"
+        role="alert"
+        aria-live="polite"
         data-test="nearby-error"
       >
-        <p class="text-base text-error">周辺情報の取得に失敗しました</p>
+        <p class="text-base text-error font-medium mb-2">周辺情報の取得に失敗しました</p>
+        <p v-if="props.errorMessage" class="text-sm text-error/80 mb-4">
+          {{ props.errorMessage }}
+        </p>
+        <button
+          type="button"
+          class="rounded-lg bg-orange-600 px-6 py-2 text-white font-medium transition hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:ring-offset-2"
+          @click="emit('retry')"
+        >
+          再試行
+        </button>
       </div>
 
       <!-- ローディング状態（スケルトン） -->
-      <div v-else-if="isLoading" class="relative" data-test="nearby-loading">
+      <div v-else-if="props.isLoading" class="relative" data-test="nearby-loading">
         <div class="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
           <div
             v-for="i in 10"

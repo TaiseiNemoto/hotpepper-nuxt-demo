@@ -18,11 +18,36 @@ export interface ShopSearchParams {
 }
 
 /**
+ * 店舗検索オプション
+ */
+export interface UseShopSearchOptions {
+  /**
+   * SSRで実行するかどうか（デフォルト: true）
+   * - true: SSRで初期データ取得、クライアント側でもキャッシュ利用
+   * - false: CSRのみで実行（例: 位置情報検索）
+   */
+  server?: boolean
+  /**
+   * 即座に実行するかどうか（デフォルト: true）
+   * - true: コンポーネントマウント時に自動実行
+   * - false: execute()を手動で呼び出すまで実行しない
+   */
+  immediate?: boolean
+}
+
+/**
  * 店舗検索API呼び出し
  * HP-01: 店舗検索
+ *
+ * @param params - 検索パラメータ（reactive可）
+ * @param options - 実行オプション（server, immediate）
  */
-export const useShopSearch = (params?: MaybeRef<ShopSearchParams>) => {
+export const useShopSearch = (
+  params?: MaybeRef<ShopSearchParams>,
+  options?: UseShopSearchOptions,
+) => {
   const searchParams = computed(() => unref(params) ?? {})
+  const { server = true, immediate = true } = options ?? {}
 
   // クエリパラメータを構築
   const query = computed(() => {
@@ -57,12 +82,10 @@ export const useShopSearch = (params?: MaybeRef<ShopSearchParams>) => {
     execute,
   } = useInternalApi<ShopSearchResponse>('/api/hp/shops/search', {
     query,
-    // SSRで実行（初期データ取得）
-    server: true,
-    // クライアント側でもキャッシュを利用
-    lazy: false,
+    server,
+    lazy: !immediate,
     // クエリパラメータが変更されたら自動的に再フェッチ
-    watch: [query],
+    watch: immediate ? [query] : undefined,
   })
 
   // レスポンスから個別のデータを取得
