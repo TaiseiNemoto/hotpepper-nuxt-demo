@@ -1,21 +1,31 @@
 <script setup lang="ts">
-import type { ShopDetail } from '../../../server/types/hp-internal'
-import { mockShopDetail } from '../../../tests/fixtures/shops'
+/**
+ * 店舗詳細ページ
+ *
+ * 機能:
+ * - 店舗詳細情報の表示（名前、住所、営業時間など）
+ * - Google Maps APIを使った地図表示
+ * - 公式詳細ページへのリンク
+ * - SSRによるSEO最適化
+ */
 
 // URLパラメータから店舗ID取得
 const route = useRoute()
 const shopId = route.params.id as string
 
-// モックデータから店舗詳細取得（3.3フェーズでAPI結合予定）
-const shop = ref<ShopDetail | null>(null)
+// useShopDetail composableで店舗詳細を取得
+const { shop, isNotFound, isLoading, apiError, errorMessage, refresh } = useShopDetail(shopId)
 
-// 店舗IDが存在するかチェック
-if (shopId === mockShopDetail.id) {
-  shop.value = mockShopDetail
-} else {
-  // 存在しない店舗IDの場合は404エラー
-  throw createError({ statusCode: 404, message: '店舗が見つかりませんでした' })
-}
+// 404エラー時はNuxtのエラーハンドリングに委譲
+watch(
+  isNotFound,
+  (notFound) => {
+    if (notFound) {
+      throw createError({ statusCode: 404, message: '店舗が見つかりませんでした' })
+    }
+  },
+  { immediate: true },
+)
 
 // SEO設定（店舗情報から動的に生成）
 const pageTitle = computed(() => shop.value?.name ?? '店舗詳細')
@@ -29,39 +39,88 @@ const pageDescription = computed(() => {
 })
 const ogImage = computed(() => shop.value?.photo?.l ?? '')
 
+// computedをそのまま渡してリアクティブ性を維持
 useSeoMeta({
-  title: pageTitle.value,
-  ogTitle: pageTitle.value,
-  description: pageDescription.value,
-  ogDescription: pageDescription.value,
+  title: pageTitle,
+  ogTitle: pageTitle,
+  description: pageDescription,
+  ogDescription: pageDescription,
   ogType: 'article',
-  ogImage: ogImage.value,
+  ogImage: ogImage,
 })
 
-// 公式詳細ページURL
-const officialUrl = computed(() => shop.value?.urlPc ?? '')
-const hasOfficialUrl = computed(() => Boolean(officialUrl.value))
+// 公式詳細ページURLの存在チェック
+const hasOfficialUrl = computed(() => Boolean(shop.value?.urlPc))
 
-// Google Maps用の位置情報
-const hasLocation = computed(
-  () =>
-    shop.value?.lat !== undefined &&
-    shop.value?.lat !== null &&
-    shop.value?.lng !== undefined &&
-    shop.value?.lng !== null,
-)
+// Google Maps用の位置情報チェック
+const hasLocation = computed(() => {
+  const lat = shop.value?.lat
+  const lng = shop.value?.lng
+  return lat != null && lng != null
+})
 </script>
 
 <template>
   <div class="mx-auto max-w-6xl px-6 py-8">
-    <div v-if="shop" class="space-y-8">
+    <!-- ローディング状態 -->
+    <div
+      v-if="isLoading"
+      class="space-y-8 animate-pulse"
+      role="status"
+      aria-busy="true"
+      aria-label="店舗詳細を読み込み中"
+      data-test="shop-loading"
+    >
+      <!-- ヘッダースケルトン -->
+      <div class="space-y-4">
+        <div class="h-10 w-3/4 bg-gray-200 rounded"></div>
+        <div class="h-6 w-1/2 bg-gray-200 rounded"></div>
+        <div class="h-64 bg-gray-200 rounded-xl"></div>
+      </div>
+      <!-- ボタンスケルトン -->
+      <div class="flex justify-center">
+        <div class="h-14 w-64 bg-gray-200 rounded-xl"></div>
+      </div>
+      <!-- 基本情報スケルトン -->
+      <div class="space-y-4">
+        <div class="h-8 w-32 bg-gray-200 rounded"></div>
+        <div class="h-48 bg-gray-200 rounded-xl"></div>
+      </div>
+      <!-- 地図スケルトン -->
+      <div class="space-y-4">
+        <div class="h-8 w-48 bg-gray-200 rounded"></div>
+        <div class="h-96 bg-gray-200 rounded-xl"></div>
+      </div>
+    </div>
+
+    <!-- エラー表示 -->
+    <div
+      v-else-if="apiError"
+      role="alert"
+      aria-live="polite"
+      data-test="shop-error"
+      class="rounded-xl bg-red-50 border border-red-200 p-8 text-center"
+    >
+      <p class="text-red-600 font-medium mb-4">{{ errorMessage }}</p>
+      <button
+        type="button"
+        data-test="shop-retry-button"
+        class="mt-4 rounded-lg bg-orange-600 px-6 py-2 text-white font-medium transition hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:ring-offset-2"
+        @click="() => refresh()"
+      >
+        再試行
+      </button>
+    </div>
+
+    <!-- 店舗詳細表示 -->
+    <div v-else-if="shop" class="space-y-8" data-test="shop-content">
       <!-- ShopHeader -->
       <ShopHeader :shop="shop" data-test="shop-detail-header" />
 
       <!-- 公式詳細ページボタン -->
-      <div v-if="hasOfficialUrl" class="flex justify-center" data-test="shop-actions">
+      <div v-if="hasOfficialUrl && shop.urlPc" class="flex justify-center" data-test="shop-actions">
         <a
-          :href="officialUrl"
+          :href="shop.urlPc"
           target="_blank"
           rel="noopener noreferrer"
           class="inline-flex items-center rounded-xl bg-orange-600 px-8 py-4 text-lg font-semibold text-white shadow-md transition-all hover:bg-orange-700 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
@@ -85,15 +144,15 @@ const hasLocation = computed(
         </a>
       </div>
 
-      <!-- 基本情報 -->
-      <section data-test="shop-info-section">
-        <h2 class="mb-6 text-2xl font-bold text-gray-900">基本情報</h2>
+      <!-- 基本情報セクション -->
+      <section aria-labelledby="shop-info-heading" data-test="shop-info-section">
+        <h2 id="shop-info-heading" class="mb-6 text-2xl font-bold text-gray-900">基本情報</h2>
         <ShopInfoGrid :shop="shop" />
       </section>
 
-      <!-- 地図 -->
-      <section v-if="hasLocation" data-test="shop-map-section">
-        <h2 class="mb-6 text-2xl font-bold text-gray-900">アクセスマップ</h2>
+      <!-- アクセスマップセクション -->
+      <section v-if="hasLocation" aria-labelledby="shop-map-heading" data-test="shop-map-section">
+        <h2 id="shop-map-heading" class="mb-6 text-2xl font-bold text-gray-900">アクセスマップ</h2>
         <ClientOnly>
           <ShopMap :lat="shop.lat" :lng="shop.lng" :shop-name="shop.name" />
           <template #fallback>
