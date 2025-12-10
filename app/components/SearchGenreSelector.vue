@@ -12,8 +12,6 @@ const emit = defineEmits<{
   'update:modelValue': [value: string[]]
 }>()
 
-const genreToAdd = ref<string>('')
-
 const availableGenres = computed(() => {
   return props.genres.filter((g) => !props.modelValue.includes(g.code))
 })
@@ -22,10 +20,13 @@ const getGenreName = (code: string): string => {
   return props.genres.find((g) => g.code === code)?.name ?? code
 }
 
-const addGenre = () => {
-  if (genreToAdd.value && props.modelValue.length < GENRE_LIMIT) {
-    emit('update:modelValue', [...props.modelValue, genreToAdd.value])
-    genreToAdd.value = ''
+const addGenre = (event: Event) => {
+  const select = event.target as HTMLSelectElement
+  const value = select.value
+
+  if (value && props.modelValue.length < GENRE_LIMIT) {
+    emit('update:modelValue', [...props.modelValue, value])
+    select.value = ''
   }
 }
 
@@ -39,7 +40,7 @@ const removeGenre = (code: string) => {
 
 <template>
   <div>
-    <label class="mb-2 block text-sm font-medium text-gray-700">
+    <label for="genre-selector" class="mb-2 block text-sm font-medium text-gray-700">
       ジャンル
       <span class="ml-1 text-xs text-gray-500">(最大{{ GENRE_LIMIT }}件)</span>
     </label>
@@ -60,7 +61,7 @@ const removeGenre = (code: string) => {
       </div>
       <!-- ジャンル選択ドロップダウン -->
       <select
-        v-model="genreToAdd"
+        id="genre-selector"
         :disabled="modelValue.length >= GENRE_LIMIT"
         class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm transition focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-200 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500"
         @change="addGenre"
