@@ -1,12 +1,10 @@
 <script setup lang="ts">
-import type { Genre, LargeArea, MiddleArea, SmallArea } from '../../server/types/hp-internal'
+import type { Genre, LargeArea } from '../../server/types/hp-internal'
 
 // Props定義
 defineProps<{
   genres: Genre[]
   largeAreas: LargeArea[]
-  middleAreas: MiddleArea[]
-  smallAreas: SmallArea[]
 }>()
 
 // Reactive state 定義
@@ -81,8 +79,6 @@ const handleSubmit = () => {
       <!-- エリア選択UI -->
       <SearchAreaSelector
         :large-areas="largeAreas"
-        :middle-areas="middleAreas"
-        :small-areas="smallAreas"
         @update:selected-large-areas="selectedLargeAreas = $event"
         @update:selected-middle-areas="selectedMiddleAreas = $event"
         @update:selected-small-areas="selectedSmallAreas = $event"

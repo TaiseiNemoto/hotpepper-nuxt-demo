@@ -3,7 +3,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import handler from '../../../../../server/api/hp/areas/middle.get'
 import { createTestEvent } from '../../../../utils/createTestEvent'
 import { createFailureResult, createSuccessResult } from '../../../../../server/types/api'
-import { toMiddleAreasResponse } from '../../../../../server/utils/hp-transformers'
 import { mockHpMiddleAreaResults } from '../../../../fixtures/hotpepper'
 import { mockApiError } from '../../../../fixtures/errors'
 import type { HotpepperClient } from '../../../../../server/utils/hotpepper-client'
@@ -26,15 +25,17 @@ describe('HP-05 中エリア API', () => {
     return { getMiddleAreas }
   }
 
-  it('クエリ無しで全件返す', async () => {
+  it('largeAreaCode が無い場合は空の配列を返す', async () => {
     const { getMiddleAreas } = setupClient()
-    getMiddleAreas.mockResolvedValue(createSuccessResult(mockHpMiddleAreaResults))
 
     const event = createTestEvent({ path: '/api/hp/areas/middle' })
     const result = await handler(event)
 
-    expect(getMiddleAreas).toHaveBeenCalledWith(undefined)
-    expect(result).toEqual(createSuccessResult(toMiddleAreasResponse(mockHpMiddleAreaResults)))
+    expect(result.success).toBe(true)
+    if (result.success) {
+      expect(result.data.areas).toEqual([])
+    }
+    expect(getMiddleAreas).not.toHaveBeenCalled()
   })
 
   it('largeAreaCode 指定時は引数を付与する', async () => {
@@ -72,7 +73,10 @@ describe('HP-05 中エリア API', () => {
     const { getMiddleAreas } = setupClient()
     getMiddleAreas.mockResolvedValue(createFailureResult(mockApiError.error))
 
-    const event = createTestEvent({ path: '/api/hp/areas/middle', query: { testError: 'true' } })
+    const event = createTestEvent({
+      path: '/api/hp/areas/middle',
+      query: { largeAreaCode: 'Z011', testError: 'true' },
+    })
     const result = await handler(event)
 
     expect(result).toEqual(createFailureResult(mockApiError.error))

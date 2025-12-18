@@ -2,15 +2,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
 import { flushPromises } from '@vue/test-utils'
 import IndexPage from '~/pages/index.vue'
-import { mockGenres, mockLargeAreas, mockMiddleAreas, mockSmallAreas } from '../fixtures/masters'
+import { mockGenres, mockLargeAreas } from '../fixtures/masters'
 import { mockShopList } from '../fixtures/shops'
 import type { ApiError } from '../../server/types/api'
 
 // モック関数を作成
 const mockRefreshGenres = vi.fn()
 const mockRefreshLargeAreas = vi.fn()
-const mockRefreshMiddleAreas = vi.fn()
-const mockRefreshSmallAreas = vi.fn()
 const mockExecuteShopSearch = vi.fn()
 
 // モック状態を保持する変数
@@ -23,20 +21,6 @@ let genresState = {
 
 let largeAreasState = {
   areas: mockLargeAreas,
-  isLoading: false,
-  apiError: null as ApiError | null,
-  errorMessage: '',
-}
-
-let middleAreasState = {
-  areas: mockMiddleAreas,
-  isLoading: false,
-  apiError: null as ApiError | null,
-  errorMessage: '',
-}
-
-let smallAreasState = {
-  areas: mockSmallAreas,
   isLoading: false,
   apiError: null as ApiError | null,
   errorMessage: '',
@@ -70,26 +54,6 @@ mockNuxtImport('useLargeAreas', () => {
   })
 })
 
-mockNuxtImport('useMiddleAreas', () => {
-  return () => ({
-    areas: computed(() => middleAreasState.areas),
-    isLoading: computed(() => middleAreasState.isLoading),
-    apiError: computed(() => middleAreasState.apiError),
-    errorMessage: computed(() => middleAreasState.errorMessage),
-    refresh: mockRefreshMiddleAreas,
-  })
-})
-
-mockNuxtImport('useSmallAreas', () => {
-  return () => ({
-    areas: computed(() => smallAreasState.areas),
-    isLoading: computed(() => smallAreasState.isLoading),
-    apiError: computed(() => smallAreasState.apiError),
-    errorMessage: computed(() => smallAreasState.errorMessage),
-    refresh: mockRefreshSmallAreas,
-  })
-})
-
 mockNuxtImport('useShopSearch', () => {
   return () => ({
     shops: computed(() => shopSearchState.shops),
@@ -118,20 +82,6 @@ describe('TOPページ', () => {
 
     largeAreasState = {
       areas: mockLargeAreas,
-      isLoading: false,
-      apiError: null,
-      errorMessage: '',
-    }
-
-    middleAreasState = {
-      areas: mockMiddleAreas,
-      isLoading: false,
-      apiError: null,
-      errorMessage: '',
-    }
-
-    smallAreasState = {
-      areas: mockSmallAreas,
       isLoading: false,
       apiError: null,
       errorMessage: '',

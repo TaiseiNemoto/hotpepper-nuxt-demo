@@ -40,17 +40,16 @@ describe('HP-06 小エリア API', () => {
     expect(result).toEqual(createSuccessResult(toSmallAreasResponse(mockHpSmallAreaResults)))
   })
 
-  it('middleAreaCode が無い場合は400', async () => {
+  it('middleAreaCode が無い場合は空の配列を返す', async () => {
     const { getSmallAreas } = setupClient()
 
     const event = createTestEvent({ path: '/api/hp/areas/small' })
     const result = await handler(event)
 
-    expect(result.success).toBe(false)
-    if (!result.success) {
-      expect(result.error.code).toBe('VALIDATION_ERROR')
+    expect(result.success).toBe(true)
+    if (result.success) {
+      expect(result.data.areas).toEqual([])
     }
-    expect(event.node.res.statusCode).toBe(400)
     expect(getSmallAreas).not.toHaveBeenCalled()
   })
 

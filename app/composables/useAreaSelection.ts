@@ -12,15 +12,15 @@ const getName = <T extends { code: string; name: string }>(items: T[], code: str
   return items.find((item) => item.code === code)?.name ?? code
 }
 
-export function useAreaSelection(
-  largeAreas: LargeArea[],
-  middleAreas: MiddleArea[],
-  smallAreas: SmallArea[],
-) {
+export function useAreaSelection(largeAreas: LargeArea[]) {
   // Reactive state 定義
   const selectedLargeAreas = ref<string[]>([])
   const selectedMiddleAreas = ref<string[]>([])
   const selectedSmallAreas = ref<string[]>([])
+
+  // 動的データ取得
+  const { areas: middleAreas, isLoading: isLoadingMiddle } = useMiddleAreas(selectedLargeAreas)
+  const { areas: smallAreas, isLoading: isLoadingSmall } = useSmallAreas(selectedMiddleAreas)
 
   // 追加用の一時変数
   const largeAreaToAdd = ref<string>('')
@@ -35,7 +35,7 @@ export function useAreaSelection(
   // パフォーマンス最適化: 中エリアを大エリアごとにグループ化
   const middleAreasByLarge = computed(() => {
     const map = new Map<string, MiddleArea[]>()
-    middleAreas.forEach((area) => {
+    middleAreas.value.forEach((area) => {
       const key = area.parentLarge.code
       if (!map.has(key)) map.set(key, [])
       map.get(key)!.push(area)
@@ -52,7 +52,7 @@ export function useAreaSelection(
   // パフォーマンス最適化: 小エリアを中エリアごとにグループ化
   const smallAreasByMiddle = computed(() => {
     const map = new Map<string, SmallArea[]>()
-    smallAreas.forEach((area) => {
+    smallAreas.value.forEach((area) => {
       const parentMiddle = area.parentMiddle
       if (parentMiddle) {
         const key = parentMiddle.code
@@ -71,9 +71,9 @@ export function useAreaSelection(
 
   const getLargeAreaName = (code: string) => getName(largeAreas, code)
 
-  const getMiddleAreaName = (code: string) => getName(middleAreas, code)
+  const getMiddleAreaName = (code: string) => getName(middleAreas.value, code)
 
-  const getSmallAreaName = (code: string) => getName(smallAreas, code)
+  const getSmallAreaName = (code: string) => getName(smallAreas.value, code)
 
   const addLargeArea = () => {
     if (largeAreaToAdd.value && selectedLargeAreas.value.length < AREA_LIMITS.LARGE_AREAS) {
@@ -84,49 +84,13 @@ export function useAreaSelection(
 
   const addMiddleArea = () => {
     if (middleAreaToAdd.value && selectedMiddleAreas.value.length < AREA_LIMITS.MIDDLE_AREAS) {
-      const middleArea = middleAreas.find((a) => a.code === middleAreaToAdd.value)
-      if (middleArea) {
-        // 親の大エリアを自動選択
-        if (!selectedLargeAreas.value.includes(middleArea.parentLarge.code)) {
-          if (selectedLargeAreas.value.length < AREA_LIMITS.LARGE_AREAS) {
-            selectedLargeAreas.value = [...selectedLargeAreas.value, middleArea.parentLarge.code]
-          } else {
-            console.warn('大エリアの上限に達しているため、自動選択できません')
-          }
-        }
-        selectedMiddleAreas.value = [...selectedMiddleAreas.value, middleAreaToAdd.value]
-        middleAreaToAdd.value = ''
-      }
+      selectedMiddleAreas.value = [...selectedMiddleAreas.value, middleAreaToAdd.value]
+      middleAreaToAdd.value = ''
     }
   }
 
   const addSmallArea = () => {
     if (smallAreaToAdd.value && selectedSmallAreas.value.length < AREA_LIMITS.SMALL_AREAS) {
-      const smallArea = smallAreas.find((a) => a.code === smallAreaToAdd.value)
-      if (!smallArea) return
-
-      const parentMiddle = smallArea.parentMiddle
-      if (!parentMiddle) return
-
-      const middleArea = middleAreas.find((a) => a.code === parentMiddle.code)
-      if (middleArea) {
-        // 親の大エリアを自動選択
-        if (!selectedLargeAreas.value.includes(middleArea.parentLarge.code)) {
-          if (selectedLargeAreas.value.length < AREA_LIMITS.LARGE_AREAS) {
-            selectedLargeAreas.value = [...selectedLargeAreas.value, middleArea.parentLarge.code]
-          } else {
-            console.warn('大エリアの上限に達しているため、自動選択できません')
-          }
-        }
-        // 親の中エリアを自動選択
-        if (!selectedMiddleAreas.value.includes(middleArea.code)) {
-          if (selectedMiddleAreas.value.length < AREA_LIMITS.MIDDLE_AREAS) {
-            selectedMiddleAreas.value = [...selectedMiddleAreas.value, middleArea.code]
-          } else {
-            console.warn('中エリアの上限に達しているため、自動選択できません')
-          }
-        }
-      }
       selectedSmallAreas.value = [...selectedSmallAreas.value, smallAreaToAdd.value]
       smallAreaToAdd.value = ''
     }
@@ -134,14 +98,14 @@ export function useAreaSelection(
 
   const removeLargeArea = (code: string) => {
     // 配下の中・小エリアも削除
-    const relatedMiddleAreas = middleAreas
+    const relatedMiddleAreas = middleAreas.value
       .filter((a) => a.parentLarge.code === code)
       .map((a) => a.code)
     selectedMiddleAreas.value = selectedMiddleAreas.value.filter(
       (c) => !relatedMiddleAreas.includes(c),
     )
 
-    const relatedSmallAreas = smallAreas
+    const relatedSmallAreas = smallAreas.value
       .filter((a) => a.parentMiddle && relatedMiddleAreas.includes(a.parentMiddle.code))
       .map((a) => a.code)
     selectedSmallAreas.value = selectedSmallAreas.value.filter(
@@ -153,7 +117,7 @@ export function useAreaSelection(
 
   const removeMiddleArea = (code: string) => {
     // 配下の小エリアも削除
-    const relatedSmallAreas = smallAreas
+    const relatedSmallAreas = smallAreas.value
       .filter((a) => a.parentMiddle?.code === code)
       .map((a) => a.code)
     selectedSmallAreas.value = selectedSmallAreas.value.filter(
@@ -179,6 +143,9 @@ export function useAreaSelection(
     availableLargeAreas,
     availableMiddleAreas,
     availableSmallAreas,
+    // Loading state
+    isLoadingMiddle,
+    isLoadingSmall,
     // Methods
     getLargeAreaName,
     getMiddleAreaName,

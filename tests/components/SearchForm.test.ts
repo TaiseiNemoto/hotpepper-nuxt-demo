@@ -3,18 +3,71 @@ import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
 
 import SearchForm from '~/components/SearchForm.vue'
 import { mockGenres, mockLargeAreas, mockMiddleAreas, mockSmallAreas } from '../fixtures/masters'
+import type { MiddleArea, SmallArea } from '../../server/types/hp-internal'
 
 // navigateToをモック（vi.hoisted()を使用）
 const mockNavigateTo = vi.hoisted(() => vi.fn())
 mockNuxtImport('navigateTo', () => mockNavigateTo)
+
+// useMiddleAreasとuseSmallAreasをモック
+const mockMiddleAreasState = ref<MiddleArea[]>([])
+const mockSmallAreasState = ref<SmallArea[]>([])
+
+mockNuxtImport('useMiddleAreas', () => {
+  return (largeAreaCodes?: Ref<string[]>) => {
+    watch(
+      () => largeAreaCodes?.value ?? [],
+      (codes) => {
+        if (codes.length > 0) {
+          mockMiddleAreasState.value = mockMiddleAreas.filter((area) =>
+            codes.includes(area.parentLarge.code),
+          )
+        } else {
+          mockMiddleAreasState.value = []
+        }
+      },
+      { immediate: true },
+    )
+
+    return {
+      areas: computed(() => mockMiddleAreasState.value),
+      isLoading: computed(() => false),
+      apiError: computed(() => null),
+      errorMessage: computed(() => ''),
+    }
+  }
+})
+
+mockNuxtImport('useSmallAreas', () => {
+  return (middleAreaCodes?: Ref<string[]>) => {
+    watch(
+      () => middleAreaCodes?.value ?? [],
+      (codes) => {
+        if (codes.length > 0) {
+          mockSmallAreasState.value = mockSmallAreas.filter(
+            (area) => area.parentMiddle && codes.includes(area.parentMiddle.code),
+          )
+        } else {
+          mockSmallAreasState.value = []
+        }
+      },
+      { immediate: true },
+    )
+
+    return {
+      areas: computed(() => mockSmallAreasState.value),
+      isLoading: computed(() => false),
+      apiError: computed(() => null),
+      errorMessage: computed(() => ''),
+    }
+  }
+})
 
 const createWrapper = (propsOverride = {}) =>
   mountSuspended(SearchForm, {
     props: {
       genres: mockGenres,
       largeAreas: mockLargeAreas,
-      middleAreas: mockMiddleAreas,
-      smallAreas: mockSmallAreas,
       ...propsOverride,
     },
   })
@@ -133,62 +186,18 @@ describe('SearchFormコンポーネント', () => {
       expect(smallSelect.element.disabled).toBe(false)
     })
 
-    it('中エリア選択時に親の大エリアを自動選択する', async () => {
-      const wrapper = await createWrapper()
-      const middleSelect = wrapper.get<HTMLSelectElement>('#sf-middle-area')
-
-      // まず大エリアを選択して中エリアを活性化
-      const largeSelect = wrapper.get<HTMLSelectElement>('#sf-large-area')
-      await largeSelect.setValue('Z011')
-      await largeSelect.trigger('change')
-
-      // 中エリアを選択
-      await middleSelect.setValue('Y005')
-      await middleSelect.trigger('change')
-
-      // 親の大エリア「東京」がバッジ表示される
-      expect(wrapper.text()).toContain('東京')
-      expect(wrapper.text()).toContain('渋谷')
-    })
-
-    it('小エリア選択時に親の中・大エリアを自動選択する', async () => {
-      const wrapper = await createWrapper()
-
-      // 大エリアを選択
-      const largeSelect = wrapper.get<HTMLSelectElement>('#sf-large-area')
-      await largeSelect.setValue('Z011')
-      await largeSelect.trigger('change')
-
-      // 中エリアを選択
-      const middleSelect = wrapper.get<HTMLSelectElement>('#sf-middle-area')
-      await middleSelect.setValue('Y005')
-      await middleSelect.trigger('change')
-
-      // 小エリアを選択
-      const smallSelect = wrapper.get<HTMLSelectElement>('#sf-small-area')
-      await smallSelect.setValue('X010')
-      await smallSelect.trigger('change')
-
-      // すべての階層がバッジ表示される
-      expect(wrapper.text()).toContain('東京')
-      expect(wrapper.text()).toContain('渋谷')
-      expect(wrapper.text()).toContain('渋谷駅周辺')
-    })
-
     it('親エリア削除時に配下のエリアを自動削除する', async () => {
       const wrapper = await createWrapper()
 
-      // 大エリアを選択
+      // 手動で各階層のエリアを選択
       const largeSelect = wrapper.get<HTMLSelectElement>('#sf-large-area')
       await largeSelect.setValue('Z011')
       await largeSelect.trigger('change')
 
-      // 中エリアを選択
       const middleSelect = wrapper.get<HTMLSelectElement>('#sf-middle-area')
       await middleSelect.setValue('Y005')
       await middleSelect.trigger('change')
 
-      // 小エリアを選択
       const smallSelect = wrapper.get<HTMLSelectElement>('#sf-small-area')
       await smallSelect.setValue('X010')
       await smallSelect.trigger('change')
@@ -203,7 +212,7 @@ describe('SearchFormコンポーネント', () => {
       const largeBadge = badges.find((b) => b.text().includes('東京') && b.text().includes('削除'))
       await largeBadge?.trigger('click')
 
-      // すべてのバッジが削除される（ドロップダウンには残る）
+      // 配下の中・小エリアも自動削除される
       const badgesAfter = wrapper.findAll('button[type="button"]')
       const tokyoBadge = badgesAfter.find(
         (b) => b.text().includes('東京') && b.text().includes('削除'),

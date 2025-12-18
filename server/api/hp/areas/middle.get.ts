@@ -9,7 +9,8 @@ import { createSuccessResult } from '../../../types/api'
 import { toMiddleAreasResponse } from '../../../utils/hp-transformers'
 import { normalizeCode, toRecord } from '../../../utils/validation'
 
-// HP-05 中エリアマスタ取得API（大エリアコード任意）
+// HP-05 中エリアマスタ取得API
+// largeAreaCodeが未指定の場合は空の配列を返す（初期ロード時の400エラーを回避）
 
 export default defineEventHandler(async (event) => {
   let query: { largeAreaCode?: string }
@@ -25,9 +26,13 @@ export default defineEventHandler(async (event) => {
     throw error
   }
 
+  // largeAreaCodeが未指定の場合は空の配列を返す
+  if (!query.largeAreaCode) {
+    return createSuccessResult({ areas: [] })
+  }
+
   const client = createHotpepperClient(event)
-  const params = query.largeAreaCode ? { large_area: query.largeAreaCode } : undefined
-  const result = await client.getMiddleAreas(params)
+  const result = await client.getMiddleAreas({ large_area: query.largeAreaCode })
   if (!result.success) {
     return respondWithUpstreamError(event, result.error)
   }

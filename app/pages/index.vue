@@ -27,45 +27,16 @@ const {
   refresh: refreshLargeAreas,
 } = useLargeAreas()
 
-const {
-  areas: middleAreas,
-  isLoading: isLoadingMiddleAreas,
-  apiError: middleAreasError,
-  errorMessage: middleAreasErrorMessage,
-  refresh: refreshMiddleAreas,
-} = useMiddleAreas()
-
-const {
-  areas: smallAreas,
-  isLoading: isLoadingSmallAreas,
-  apiError: smallAreasError,
-  errorMessage: smallAreasErrorMessage,
-  refresh: refreshSmallAreas,
-} = useSmallAreas()
-
 // マスタデータのローディング状態を統合
-const isLoadingMasters = computed(
-  () =>
-    isLoadingGenres.value ||
-    isLoadingLargeAreas.value ||
-    isLoadingMiddleAreas.value ||
-    isLoadingSmallAreas.value,
-)
+const isLoadingMasters = computed(() => isLoadingGenres.value || isLoadingLargeAreas.value)
 
 // マスタデータのエラー状態を統合
 const mastersError = computed(() => {
-  return (
-    genresError.value || largeAreasError.value || middleAreasError.value || smallAreasError.value
-  )
+  return genresError.value || largeAreasError.value
 })
 
 const mastersErrorMessage = computed(() => {
-  const errors = [
-    genresErrorMessage.value,
-    largeAreasErrorMessage.value,
-    middleAreasErrorMessage.value,
-    smallAreasErrorMessage.value,
-  ].filter(Boolean)
+  const errors = [genresErrorMessage.value, largeAreasErrorMessage.value].filter(Boolean)
 
   if (errors.length === 0) return '検索フォームの読み込みに失敗しました'
   if (errors.length === 1) return errors[0]
@@ -74,12 +45,7 @@ const mastersErrorMessage = computed(() => {
 
 // マスタデータの再試行
 const retryLoadMasters = async () => {
-  await Promise.all([
-    refreshGenres(),
-    refreshLargeAreas(),
-    refreshMiddleAreas(),
-    refreshSmallAreas(),
-  ])
+  await Promise.all([refreshGenres(), refreshLargeAreas()])
 }
 
 // 周辺店舗データ取得（CSRのみ）
@@ -165,13 +131,7 @@ const retryNearbySearch = async () => {
       </div>
 
       <!-- 検索フォーム表示 -->
-      <SearchForm
-        v-else
-        :genres="genres"
-        :large-areas="largeAreas"
-        :middle-areas="middleAreas"
-        :small-areas="smallAreas"
-      />
+      <SearchForm v-else :genres="genres" :large-areas="largeAreas" />
     </section>
 
     <NearbyHotCarousel
