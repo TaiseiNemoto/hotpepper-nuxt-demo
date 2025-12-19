@@ -73,36 +73,25 @@ describe('useAreaSelection', () => {
 
   describe('エリア選択', () => {
     it('大エリアを選択できる', () => {
-      const { selectedLargeAreas, addLargeArea, largeAreaToAdd } = useAreaSelection(mockLargeAreas)
+      const { selectedLargeAreas, addLargeAreaByCode } = useAreaSelection(mockLargeAreas)
 
-      largeAreaToAdd.value = 'Z011'
-      addLargeArea()
+      addLargeAreaByCode('Z011')
 
       expect(selectedLargeAreas.value).toEqual(['Z011'])
-      expect(largeAreaToAdd.value).toBe('')
     })
 
     it('中エリアを選択できる', () => {
-      const {
-        selectedLargeAreas,
-        selectedMiddleAreas,
-        addLargeArea,
-        addMiddleArea,
-        largeAreaToAdd,
-        middleAreaToAdd,
-      } = useAreaSelection(mockLargeAreas)
+      const { selectedLargeAreas, selectedMiddleAreas, addLargeAreaByCode, addMiddleAreaByCode } =
+        useAreaSelection(mockLargeAreas)
 
       // 大エリアを選択
-      largeAreaToAdd.value = 'Z011'
-      addLargeArea()
+      addLargeAreaByCode('Z011')
 
       // 中エリアを選択
-      middleAreaToAdd.value = 'Y005'
-      addMiddleArea()
+      addMiddleAreaByCode('Y005')
 
       expect(selectedLargeAreas.value).toEqual(['Z011'])
       expect(selectedMiddleAreas.value).toEqual(['Y005'])
-      expect(middleAreaToAdd.value).toBe('')
     })
 
     it('小エリアを選択できる', () => {
@@ -110,73 +99,59 @@ describe('useAreaSelection', () => {
         selectedLargeAreas,
         selectedMiddleAreas,
         selectedSmallAreas,
-        addLargeArea,
-        addMiddleArea,
-        addSmallArea,
-        largeAreaToAdd,
-        middleAreaToAdd,
-        smallAreaToAdd,
+        addLargeAreaByCode,
+        addMiddleAreaByCode,
+        addSmallAreaByCode,
       } = useAreaSelection(mockLargeAreas)
 
       // 大エリアを選択
-      largeAreaToAdd.value = 'Z011'
-      addLargeArea()
+      addLargeAreaByCode('Z011')
 
       // 中エリアを選択
-      middleAreaToAdd.value = 'Y005'
-      addMiddleArea()
+      addMiddleAreaByCode('Y005')
 
       // 小エリアを選択
-      smallAreaToAdd.value = 'X010'
-      addSmallArea()
+      addSmallAreaByCode('X010')
 
       expect(selectedLargeAreas.value).toEqual(['Z011'])
       expect(selectedMiddleAreas.value).toEqual(['Y005'])
       expect(selectedSmallAreas.value).toEqual(['X010'])
-      expect(smallAreaToAdd.value).toBe('')
     })
   })
 
   describe('上限チェック', () => {
     it('大エリアは最大3件まで選択できる', () => {
-      const { selectedLargeAreas, addLargeArea, largeAreaToAdd } = useAreaSelection(mockLargeAreas)
+      const { selectedLargeAreas, addLargeAreaByCode } = useAreaSelection(mockLargeAreas)
 
       // 3件選択
-      largeAreaToAdd.value = 'Z011'
-      addLargeArea()
-      largeAreaToAdd.value = 'Z012'
-      addLargeArea()
-      largeAreaToAdd.value = 'Z013'
-      addLargeArea()
+      addLargeAreaByCode('Z011')
+      addLargeAreaByCode('Z012')
+      addLargeAreaByCode('Z013')
 
       expect(selectedLargeAreas.value).toHaveLength(AREA_LIMITS.LARGE_AREAS)
 
       // 4件目は追加されない
-      largeAreaToAdd.value = 'Z014'
-      addLargeArea()
+      addLargeAreaByCode('Z014')
       expect(selectedLargeAreas.value).toHaveLength(AREA_LIMITS.LARGE_AREAS)
     })
 
     it('中エリアは最大5件まで選択できる', () => {
-      const { selectedMiddleAreas, addLargeArea, addMiddleArea, largeAreaToAdd, middleAreaToAdd } =
+      const { selectedMiddleAreas, addLargeAreaByCode, addMiddleAreaByCode } =
         useAreaSelection(mockLargeAreas)
 
       // 大エリアを選択
-      largeAreaToAdd.value = 'Z011'
-      addLargeArea()
+      addLargeAreaByCode('Z011')
 
       // 5件の中エリアを選択
       const middleAreaCodes = ['Y005', 'Y010', 'Y015', 'Y020', 'Y025']
       middleAreaCodes.forEach((code) => {
-        middleAreaToAdd.value = code
-        addMiddleArea()
+        addMiddleAreaByCode(code)
       })
 
       expect(selectedMiddleAreas.value).toHaveLength(AREA_LIMITS.MIDDLE_AREAS)
 
       // 6件目は追加されない
-      middleAreaToAdd.value = 'Y030'
-      addMiddleArea()
+      addMiddleAreaByCode('Y030')
       expect(selectedMiddleAreas.value).toHaveLength(AREA_LIMITS.MIDDLE_AREAS)
     })
   })
@@ -187,26 +162,20 @@ describe('useAreaSelection', () => {
         selectedLargeAreas,
         selectedMiddleAreas,
         selectedSmallAreas,
-        addLargeArea,
-        addMiddleArea,
-        addSmallArea,
+        addLargeAreaByCode,
+        addMiddleAreaByCode,
+        addSmallAreaByCode,
         removeLargeArea,
-        largeAreaToAdd,
-        middleAreaToAdd,
-        smallAreaToAdd,
       } = useAreaSelection(mockLargeAreas)
 
       // 各階層のエリアを選択
-      largeAreaToAdd.value = 'Z011'
-      addLargeArea()
+      addLargeAreaByCode('Z011')
       await flushPromises()
 
-      middleAreaToAdd.value = 'Y005'
-      addMiddleArea()
+      addMiddleAreaByCode('Y005')
       await flushPromises()
 
-      smallAreaToAdd.value = 'X010'
-      addSmallArea()
+      addSmallAreaByCode('X010')
       await flushPromises()
 
       expect(selectedLargeAreas.value).toEqual(['Z011'])
@@ -227,26 +196,20 @@ describe('useAreaSelection', () => {
       const {
         selectedMiddleAreas,
         selectedSmallAreas,
-        addLargeArea,
-        addMiddleArea,
-        addSmallArea,
+        addLargeAreaByCode,
+        addMiddleAreaByCode,
+        addSmallAreaByCode,
         removeMiddleArea,
-        largeAreaToAdd,
-        middleAreaToAdd,
-        smallAreaToAdd,
       } = useAreaSelection(mockLargeAreas)
 
       // 各階層のエリアを選択
-      largeAreaToAdd.value = 'Z011'
-      addLargeArea()
+      addLargeAreaByCode('Z011')
       await flushPromises()
 
-      middleAreaToAdd.value = 'Y005'
-      addMiddleArea()
+      addMiddleAreaByCode('Y005')
       await flushPromises()
 
-      smallAreaToAdd.value = 'X010'
-      addSmallArea()
+      addSmallAreaByCode('X010')
       await flushPromises()
 
       expect(selectedMiddleAreas.value).toEqual(['Y005'])

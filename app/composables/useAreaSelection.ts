@@ -22,11 +22,6 @@ export function useAreaSelection(largeAreas: LargeArea[]) {
   const { areas: middleAreas, isLoading: isLoadingMiddle } = useMiddleAreas(selectedLargeAreas)
   const { areas: smallAreas, isLoading: isLoadingSmall } = useSmallAreas(selectedMiddleAreas)
 
-  // 追加用の一時変数
-  const largeAreaToAdd = ref<string>('')
-  const middleAreaToAdd = ref<string>('')
-  const smallAreaToAdd = ref<string>('')
-
   // エリア関連の処理
   const availableLargeAreas = computed(() => {
     return largeAreas.filter((a) => !selectedLargeAreas.value.includes(a.code))
@@ -75,24 +70,21 @@ export function useAreaSelection(largeAreas: LargeArea[]) {
 
   const getSmallAreaName = (code: string) => getName(smallAreas.value, code)
 
-  const addLargeArea = () => {
-    if (largeAreaToAdd.value && selectedLargeAreas.value.length < AREA_LIMITS.LARGE_AREAS) {
-      selectedLargeAreas.value = [...selectedLargeAreas.value, largeAreaToAdd.value]
-      largeAreaToAdd.value = ''
+  const addLargeAreaByCode = (code: string) => {
+    if (code && selectedLargeAreas.value.length < AREA_LIMITS.LARGE_AREAS) {
+      selectedLargeAreas.value = [...selectedLargeAreas.value, code]
     }
   }
 
-  const addMiddleArea = () => {
-    if (middleAreaToAdd.value && selectedMiddleAreas.value.length < AREA_LIMITS.MIDDLE_AREAS) {
-      selectedMiddleAreas.value = [...selectedMiddleAreas.value, middleAreaToAdd.value]
-      middleAreaToAdd.value = ''
+  const addMiddleAreaByCode = (code: string) => {
+    if (code && selectedMiddleAreas.value.length < AREA_LIMITS.MIDDLE_AREAS) {
+      selectedMiddleAreas.value = [...selectedMiddleAreas.value, code]
     }
   }
 
-  const addSmallArea = () => {
-    if (smallAreaToAdd.value && selectedSmallAreas.value.length < AREA_LIMITS.SMALL_AREAS) {
-      selectedSmallAreas.value = [...selectedSmallAreas.value, smallAreaToAdd.value]
-      smallAreaToAdd.value = ''
+  const addSmallAreaByCode = (code: string) => {
+    if (code && selectedSmallAreas.value.length < AREA_LIMITS.SMALL_AREAS) {
+      selectedSmallAreas.value = [...selectedSmallAreas.value, code]
     }
   }
 
@@ -136,9 +128,6 @@ export function useAreaSelection(largeAreas: LargeArea[]) {
     selectedLargeAreas,
     selectedMiddleAreas,
     selectedSmallAreas,
-    largeAreaToAdd,
-    middleAreaToAdd,
-    smallAreaToAdd,
     // Computed
     availableLargeAreas,
     availableMiddleAreas,
@@ -150,9 +139,9 @@ export function useAreaSelection(largeAreas: LargeArea[]) {
     getLargeAreaName,
     getMiddleAreaName,
     getSmallAreaName,
-    addLargeArea,
-    addMiddleArea,
-    addSmallArea,
+    addLargeAreaByCode,
+    addMiddleAreaByCode,
+    addSmallAreaByCode,
     removeLargeArea,
     removeMiddleArea,
     removeSmallArea,

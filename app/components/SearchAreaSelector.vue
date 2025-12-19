@@ -16,9 +16,6 @@ const {
   selectedLargeAreas,
   selectedMiddleAreas,
   selectedSmallAreas,
-  largeAreaToAdd,
-  middleAreaToAdd,
-  smallAreaToAdd,
   availableLargeAreas,
   availableMiddleAreas,
   availableSmallAreas,
@@ -27,9 +24,9 @@ const {
   getLargeAreaName,
   getMiddleAreaName,
   getSmallAreaName,
-  addLargeArea,
-  addMiddleArea,
-  addSmallArea,
+  addLargeAreaByCode,
+  addMiddleAreaByCode,
+  addSmallAreaByCode,
   removeLargeArea,
   removeMiddleArea,
   removeSmallArea,
@@ -105,10 +102,15 @@ watch(selectedSmallAreas, (newValue) => {
         </label>
         <select
           id="sf-large-area"
-          v-model="largeAreaToAdd"
           :disabled="selectedLargeAreas.length >= AREA_LIMITS.LARGE_AREAS"
           class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm transition focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-200 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500"
-          @change="addLargeArea"
+          @change="
+            (e) => {
+              const target = e.target as HTMLSelectElement
+              addLargeAreaByCode(target.value)
+              target.value = ''
+            }
+          "
         >
           <option value="">大エリアを選択...</option>
           <option v-for="area in availableLargeAreas" :key="area.code" :value="area.code">
@@ -125,14 +127,19 @@ watch(selectedSmallAreas, (newValue) => {
         </label>
         <select
           id="sf-middle-area"
-          v-model="middleAreaToAdd"
           :disabled="
             selectedLargeAreas.length === 0 ||
             selectedMiddleAreas.length >= AREA_LIMITS.MIDDLE_AREAS ||
             isLoadingMiddle
           "
           class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm transition focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-200 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500"
-          @change="addMiddleArea"
+          @change="
+            (e) => {
+              const target = e.target as HTMLSelectElement
+              addMiddleAreaByCode(target.value)
+              target.value = ''
+            }
+          "
         >
           <option value="">
             {{ isLoadingMiddle ? '読み込み中...' : '中エリアを選択...' }}
@@ -151,14 +158,19 @@ watch(selectedSmallAreas, (newValue) => {
         </label>
         <select
           id="sf-small-area"
-          v-model="smallAreaToAdd"
           :disabled="
             selectedMiddleAreas.length === 0 ||
             selectedSmallAreas.length >= AREA_LIMITS.SMALL_AREAS ||
             isLoadingSmall
           "
           class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm transition focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-200 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500"
-          @change="addSmallArea"
+          @change="
+            (e) => {
+              const target = e.target as HTMLSelectElement
+              addSmallAreaByCode(target.value)
+              target.value = ''
+            }
+          "
         >
           <option value="">
             {{ isLoadingSmall ? '読み込み中...' : '小エリアを選択...' }}
